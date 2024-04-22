@@ -30,6 +30,7 @@ public class Tokenizer {
                 token.append(c);
             }
         }
+
         String[] tokensArray = new String[tokens.size()];
         tokens.toArray(tokensArray);
         return tokensArray;
