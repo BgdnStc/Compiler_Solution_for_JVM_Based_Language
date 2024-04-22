@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Tokenizer {
     public static String[] tokenize(String line) {
         StringBuilder token = new StringBuilder();
-        ArrayList <String> tokens = new ArrayList<>();
+        ArrayList<String> tokens = new ArrayList<>();
         Integer index = 0;
         char[] inputChars = line.toCharArray();
         for (char c : inputChars) {
