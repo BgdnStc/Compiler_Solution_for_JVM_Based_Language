@@ -1,6 +1,9 @@
+package org.bgdnstc;
+
 import java.util.ArrayList;
 
 public class Tokenizer {
+
     public static String[] tokenize(String line) {
         StringBuilder token = new StringBuilder();
         ArrayList<String> tokens = new ArrayList<>();
@@ -30,7 +33,6 @@ public class Tokenizer {
                 token.append(c);
             }
         }
-
         String[] tokensArray = new String[tokens.size()];
         tokens.toArray(tokensArray);
         return tokensArray;

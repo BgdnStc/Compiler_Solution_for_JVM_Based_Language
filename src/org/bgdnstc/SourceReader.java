@@ -1,3 +1,5 @@
+package org.bgdnstc;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -12,7 +14,7 @@ public class SourceReader {
         try {
             return Files.readString(path);
         } catch (IOException e) {
-            throw new InvalidPathException("Invalid provided path:" + path.toString() + ". ", "Path should be absolute path or from current content root.");
+            throw new InvalidPathException("Invalid provided path:" + path + ". ", "Path should be absolute path or from current content root.");
         }
     }
 }

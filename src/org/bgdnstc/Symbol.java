@@ -1,0 +1,8 @@
+package org.bgdnstc;
+
+public enum Symbol {
+    INT, FLOAT, STRING, SOCKET, UDP_SERVER, UDP_CLIENT,
+    EQUALS, ADD, SUB, MUL, DIV, PRINT,
+    L_BRACKET, R_BRACKET, L_PARENTHESIS, R_PARENTHESIS, AT,
+    EOF
+}
