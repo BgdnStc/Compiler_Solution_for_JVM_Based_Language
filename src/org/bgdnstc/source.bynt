@@ -1,0 +1,2 @@
+Socket h = UDPServer @ 7777
+Socket g = UDPClient @ 7777
