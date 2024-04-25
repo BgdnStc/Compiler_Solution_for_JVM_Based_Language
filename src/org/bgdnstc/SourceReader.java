@@ -14,7 +14,7 @@ public class SourceReader {
         try {
             return Files.readString(path);
         } catch (IOException e) {
-            throw new InvalidPathException("Invalid provided path:" + path + ". ", "Path should be absolute path or from current content root.");
+            throw new InvalidPathException("Invalid provided path:" + path + ". ", "Path should be from the current content root or an absolute path.");
         }
     }
 }

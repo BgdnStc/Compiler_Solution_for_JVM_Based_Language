@@ -51,6 +51,10 @@ public class Parser {
                     return Symbol.UDP_CLIENT;
                 case "print":
                     return Symbol.PRINT;
+                case "send":
+                    return Symbol.SEND;
+                case "receive":
+                    return Symbol.RECEIVE;
                 case ".":
                     return Symbol.DOT;
                 case "(":
@@ -83,17 +87,23 @@ public class Parser {
     }
 
     private static void statement() {
-        if (match(Symbol.SOCKET)) {
+        if (check(Symbol.SOCKET)) {
+            match(Symbol.SOCKET);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
             expression(1);
             identifiers.put(line[1], DatagramPacket.class);
-        } else if (match(Symbol.TYPE_INT)) {
+        } else if (check(Symbol.TYPE_INT)) {
+            match(Symbol.TYPE_INT);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
             expression(2);
-        } else {
+        } else if (check(Symbol.INT)) {
+            expression(2);
+        } else if (check(Symbol.IDENTIFIER)) {
             expression(0);
+        } else {
+            throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
         }
     }
 
@@ -108,26 +118,41 @@ public class Parser {
                 match(Symbol.AT);
                 match(Symbol.INT);
             } else {
-                throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received: " + line[index] + ".");
+                throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
             }
         } else if (path == 2) {
             match(Symbol.INT);
             match(Symbol.INT);
-            if (check(Symbol.ADD) || check(Symbol.SUB) || check(Symbol.MUL) || check(Symbol.DIV)) {
-                match(nextSymbol());
+            if (check(Symbol.ADD)) {
+                match(Symbol.ADD);
+            } else if (check(Symbol.SUB)){
+                match(Symbol.SUB);
                 // TODO handle operation
+            } else if (check(Symbol.MUL)){
+                match(Symbol.MUL);
+            } else if (check(Symbol.DIV)) {
+                match((Symbol.DIV));
             } else {
                 match(nextSymbol());
             }
         } else if (path == 0) {
-            check(Symbol.IDENTIFIER);
-            Object identifier = identifiers.getOrDefault(line[index], null);
-            match(Symbol.IDENTIFIER);
-            if (identifier != null) {
-                match(Symbol.DOT);
-            } else {
-                throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
+            if (check(Symbol.IDENTIFIER)) {
+                Object identifier = identifiers.getOrDefault(line[index], null);
+                match(Symbol.IDENTIFIER);
+                if (identifier != null) {
+                    match(Symbol.DOT);
+                    if (check(Symbol.SEND)) {
+                        match(Symbol.SEND);
+                        match(Symbol.STRING);
+                    } else if (check(Symbol.RECEIVE)) {
+                        match(Symbol.RECEIVE);
+                    }
+                } else {
+                    throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
+                }
             }
+        } else {
+            throw new IllegalArgumentException("Unexpected tokens. Invalid expression received.");
         }
     }
 
@@ -142,7 +167,7 @@ public class Parser {
             index++;
             return true;
         } else {
-            throw new IllegalArgumentException("Unexpected token received. Expected token: " + expected + ", received: " + line[index] + " (" + current + ").");
+            throw new IllegalArgumentException("Unexpected token received. Expected token: " + expected + ", received token: " + line[index] + " (" + current + ").");
         }
     }
 }

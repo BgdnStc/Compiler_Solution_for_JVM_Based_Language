@@ -1,2 +1,5 @@
 Socket h = UDPServer @ 7777
+h.send "message"
 Socket g = UDPClient @ 7777
+2 3 ADD
+int z = 4 18 ADD
