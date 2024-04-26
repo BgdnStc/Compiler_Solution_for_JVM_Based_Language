@@ -12,6 +12,7 @@ public class Parser {
 
     public static void parse(String path) {
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
+        BytecodeGenerator.createClass("GeneratedClass");
         while (scanner.hasNextLine()) {
             index = 0;
             line = Tokenizer.tokenize(scanner.nextLine());
@@ -102,6 +103,14 @@ public class Parser {
             expression(2);
         } else if (check(Symbol.IDENTIFIER)) {
             expression(0);
+        } else if (check(Symbol.PRINT)) {
+            match(Symbol.PRINT);
+            if (check(Symbol.INT)) {
+                // TODO
+                BytecodeGenerator.printGetStatic();
+                expression(2);
+                BytecodeGenerator.printInvokeVirtualInt();
+            }
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
         }
@@ -125,6 +134,7 @@ public class Parser {
             match(Symbol.INT);
             if (check(Symbol.ADD)) {
                 match(Symbol.ADD);
+                BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 1]), Integer.parseInt(line[index - 2]));
             } else if (check(Symbol.SUB)){
                 match(Symbol.SUB);
                 // TODO handle operation
@@ -161,11 +171,10 @@ public class Parser {
         return current.equals(expected);
     }
 
-    private static boolean match(Symbol expected) {
+    private static void match(Symbol expected) {
         Symbol current = nextSymbol();
         if (current.equals(expected)) {
             index++;
-            return true;
         } else {
             throw new IllegalArgumentException("Unexpected token received. Expected token: " + expected + ", received token: " + line[index] + " (" + current + ").");
         }
