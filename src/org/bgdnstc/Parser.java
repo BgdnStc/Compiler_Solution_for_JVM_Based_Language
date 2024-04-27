@@ -8,7 +8,8 @@ import java.util.Scanner;
 public class Parser {
     static int index = 0;
     static String[] line = null;
-    static HashMap<String, Class> identifiers = new HashMap<>();
+    static HashMap<String, String[]> identifiers = new HashMap<>();
+    static Integer identifierIndex = 0;
 
     public static void parse(String path) {
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
@@ -93,7 +94,10 @@ public class Parser {
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
             expression(1);
-            identifiers.put(line[1], DatagramPacket.class);
+
+            // TODO
+
+            identifiers.put(line[1], new String[]{DatagramPacket.class.toString(), (identifierIndex++).toString()});
         } else if (check(Symbol.TYPE_INT)) {
             match(Symbol.TYPE_INT);
             match(Symbol.IDENTIFIER);
@@ -131,19 +135,23 @@ public class Parser {
             }
         } else if (path == 2) {
             match(Symbol.INT);
-            match(Symbol.INT);
-            if (check(Symbol.ADD)) {
-                match(Symbol.ADD);
-                BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 1]), Integer.parseInt(line[index - 2]));
-            } else if (check(Symbol.SUB)){
-                match(Symbol.SUB);
-                // TODO handle operation
-            } else if (check(Symbol.MUL)){
-                match(Symbol.MUL);
-            } else if (check(Symbol.DIV)) {
-                match((Symbol.DIV));
-            } else {
-                match(nextSymbol());
+            if (line.length == index - 1) {
+
+            } else if (check(Symbol.INT)) {
+                match(Symbol.INT);
+                if (check(Symbol.ADD)) {
+                    match(Symbol.ADD);
+                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 1]), Integer.parseInt(line[index - 2]));
+                } else if (check(Symbol.SUB)) {
+                    match(Symbol.SUB);
+                    // TODO handle operation
+                } else if (check(Symbol.MUL)) {
+                    match(Symbol.MUL);
+                } else if (check(Symbol.DIV)) {
+                    match((Symbol.DIV));
+                } else {
+                    match(nextSymbol());
+                }
             }
         } else if (path == 0) {
             if (check(Symbol.IDENTIFIER)) {
