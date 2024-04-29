@@ -2,7 +2,7 @@ package org.bgdnstc;
 
 public class Main {
     public static void main(String[] args) {
-        Parser.parse("src/org/bgdnstc/source.bynt");
+        Parser.parse("src/org/bgdnstc/bytenetFile.bynt");
 
         // TODO
 //        for (String path : args) {

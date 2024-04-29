@@ -16,11 +16,28 @@ public class BytecodeGenerator {
         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         cw.visit(V21, ACC_PUBLIC, className, null, Type.getInternalName(Object.class), null);
         mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "(" + Type.getDescriptor(String[].class) + ")V", null, null);
+        mv.visitCode();
+    }
+
+    static void pushByteInt(int constant) {
+        mv.visitIntInsn(BIPUSH, constant);
+    }
+
+    static void pushShort(int constant) {
+        mv.visitIntInsn(SIPUSH, constant);
+    }
+
+    static void pushConstantLdc(Object constant) {
+        mv.visitLdcInsn(constant);
+    }
+
+    static void storeInt(int index) {
+        mv.visitVarInsn(ISTORE, index);
     }
 
     static void addIntegers(int firstOperand, int secondOperand) {
-        mv.visitLdcInsn(firstOperand);
-        mv.visitLdcInsn(secondOperand);
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
         mv.visitInsn(IADD);
     }
 
@@ -28,10 +45,6 @@ public class BytecodeGenerator {
         mv.visitLdcInsn(firstOperand);
         mv.visitLdcInsn(secondOperand);
         mv.visitInsn(FADD);
-    }
-
-    static void storeInt(int index) {
-        mv.visitVarInsn(ISTORE, index);
     }
 
     static void printGetStatic() {
@@ -44,5 +57,13 @@ public class BytecodeGenerator {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static byte[] closeClass() {
+        mv.visitInsn(RETURN);
+        mv.visitEnd();
+        mv.visitMaxs(-1, -1);
+        cw.visitEnd();
+        return cw.toByteArray();
     }
 }

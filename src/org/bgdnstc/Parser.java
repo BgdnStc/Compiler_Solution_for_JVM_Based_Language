@@ -6,19 +6,24 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Parser {
-    static int index = 0;
-    static String[] line = null;
-    static HashMap<String, String[]> identifiers = new HashMap<>();
-    static Integer identifierIndex = 0;
+    private static int index = 0;
+    private static String[] line = null;
+    private static HashMap<String, String[]> identifiers = new HashMap<>();
+    private static Integer identifierIndex = 0;
+
+    private Parser() {
+    }
 
     public static void parse(String path) {
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
-        BytecodeGenerator.createClass("GeneratedClass");
+        final String className = WriterClass.pathToClassName(path);
+        BytecodeGenerator.createClass(className);
         while (scanner.hasNextLine()) {
             index = 0;
             line = Tokenizer.tokenize(scanner.nextLine());
             statement();
         }
+        WriterClass.writeClass(className, BytecodeGenerator.closeClass());
     }
 
     private static Symbol nextSymbol() {
@@ -78,7 +83,7 @@ public class Parser {
                         return Symbol.IDENTIFIER;
                     } else if (token.matches("^\".*\"$")) {
                         return Symbol.STRING;
-                    }  else {
+                    } else {
                         throw new IllegalArgumentException("Unexpected token received.");
                     }
             }
@@ -93,15 +98,17 @@ public class Parser {
             match(Symbol.SOCKET);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
+            identifiers.put(line[1], new String[]{DatagramPacket.class.toString(), (identifierIndex++).toString()});
+
             expression(1);
 
             // TODO
 
-            identifiers.put(line[1], new String[]{DatagramPacket.class.toString(), (identifierIndex++).toString()});
         } else if (check(Symbol.TYPE_INT)) {
             match(Symbol.TYPE_INT);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
+            identifiers.put(line[1], new String[]{Integer.class.toString(), (identifierIndex++).toString()});
             expression(2);
         } else if (check(Symbol.INT)) {
             expression(2);
@@ -135,13 +142,15 @@ public class Parser {
             }
         } else if (path == 2) {
             match(Symbol.INT);
-            if (line.length == index - 1) {
-
+            if (line.length == index) {
+                BytecodeGenerator.pushByteInt(Integer.parseInt(line[index - 1]));
+                BytecodeGenerator.storeInt(identifierIndex);
             } else if (check(Symbol.INT)) {
                 match(Symbol.INT);
                 if (check(Symbol.ADD)) {
                     match(Symbol.ADD);
-                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 1]), Integer.parseInt(line[index - 2]));
+                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 2]), Integer.parseInt(line[index - 3]));
+
                 } else if (check(Symbol.SUB)) {
                     match(Symbol.SUB);
                     // TODO handle operation
