@@ -5,6 +5,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import java.io.PrintStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -45,6 +47,74 @@ public class BytecodeGenerator {
         mv.visitLdcInsn(firstOperand);
         mv.visitLdcInsn(secondOperand);
         mv.visitInsn(FADD);
+    }
+
+    static void createServerSocket(Integer socket, int index) {
+        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
+        mv.visitInsn(DUP);
+        try {
+            if(socket != null) {
+                mv.visitIntInsn(SIPUSH, socket);
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class)), false);
+            } else {
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
+            }
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        mv.visitVarInsn(ASTORE, index);
+    }
+
+    static void createClientSocket(Integer socket, int index) {
+        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
+        mv.visitInsn(DUP);
+        try {
+            if(socket != null) {
+                mv.visitIntInsn(SIPUSH, socket);
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class)), false);
+            } else {
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
+            }
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        mv.visitVarInsn(ASTORE, index);
+//        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
+//        mv.visitInsn(DUP);
+//        mv.visitIntInsn(SIPUSH, 256);
+//        mv.visitIntInsn(NEWARRAY, T_BYTE);
+//        mv.visitIntInsn(SIPUSH, 256);
+//        try {
+//            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class)), false);
+//            mv.visitVarInsn(ASTORE, index + 1);
+//        } catch (NoSuchMethodException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+
+    static void sendUDP() {
+
+    }
+
+    static void receiveUDP(int identifierIndex, int socketIndex) {
+        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
+        mv.visitInsn(DUP);
+        mv.visitIntInsn(SIPUSH, 256);
+        mv.visitIntInsn(NEWARRAY, T_BYTE);
+        mv.visitIntInsn(SIPUSH, 256);
+        try {
+            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class)), false);
+            mv.visitVarInsn(ASTORE, identifierIndex);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        mv.visitVarInsn(ALOAD, socketIndex);
+        mv.visitVarInsn(ALOAD, identifierIndex);
+        try {
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(DatagramSocket.class), "receive", Type.getMethodDescriptor(DatagramSocket.class.getMethod("receive", DatagramPacket.class)), false);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static void printGetStatic() {

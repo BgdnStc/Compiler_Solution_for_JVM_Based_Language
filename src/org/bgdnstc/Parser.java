@@ -1,6 +1,7 @@
 package org.bgdnstc;
 
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 public class Parser {
     private static int index = 0;
     private static String[] line = null;
-    private static HashMap<String, String[]> identifiers = new HashMap<>();
+    private static final HashMap<String, String[]> identifiers = new HashMap<>();
     private static Integer identifierIndex = 0;
 
     private Parser() {
@@ -97,21 +98,17 @@ public class Parser {
         if (check(Symbol.SOCKET)) {
             match(Symbol.SOCKET);
             match(Symbol.IDENTIFIER);
+            identifiers.put(line[1], new String[]{DatagramSocket.class.toString(), (++identifierIndex).toString()});
             match(Symbol.EQUALS);
-            identifiers.put(line[1], new String[]{DatagramPacket.class.toString(), (identifierIndex++).toString()});
-
             expression(1);
-
-            // TODO
-
         } else if (check(Symbol.TYPE_INT)) {
             match(Symbol.TYPE_INT);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
-            identifiers.put(line[1], new String[]{Integer.class.toString(), (identifierIndex++).toString()});
+            identifiers.put(line[1], new String[]{int.class.toString(), (++identifierIndex).toString()});
             expression(2);
         } else if (check(Symbol.INT)) {
-            expression(2);
+            expression(3);
         } else if (check(Symbol.IDENTIFIER)) {
             expression(0);
         } else if (check(Symbol.PRINT)) {
@@ -119,7 +116,7 @@ public class Parser {
             if (check(Symbol.INT)) {
                 // TODO
                 BytecodeGenerator.printGetStatic();
-                expression(2);
+                expression(3);
                 BytecodeGenerator.printInvokeVirtualInt();
             }
         } else {
@@ -133,6 +130,7 @@ public class Parser {
                 match(Symbol.UDP_SERVER);
                 match(Symbol.AT);
                 match(Symbol.INT);
+                BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), identifierIndex);
             } else if (check(Symbol.UDP_CLIENT)) {
                 match(Symbol.UDP_CLIENT);
                 match(Symbol.AT);
@@ -150,7 +148,27 @@ public class Parser {
                 if (check(Symbol.ADD)) {
                     match(Symbol.ADD);
                     BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 2]), Integer.parseInt(line[index - 3]));
-
+                    BytecodeGenerator.storeInt(identifierIndex);
+                } else if (check(Symbol.SUB)) {
+                    match(Symbol.SUB);
+                    // TODO handle operation
+                } else if (check(Symbol.MUL)) {
+                    match(Symbol.MUL);
+                } else if (check(Symbol.DIV)) {
+                    match((Symbol.DIV));
+                } else {
+                    match(nextSymbol());
+                }
+            }
+        } else if (path == 3) {
+            match(Symbol.INT);
+            if (line.length == index) {
+                BytecodeGenerator.pushByteInt(Integer.parseInt(line[index - 1]));
+            } else if (check(Symbol.INT)) {
+                match(Symbol.INT);
+                if (check(Symbol.ADD)) {
+                    match(Symbol.ADD);
+                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 2]), Integer.parseInt(line[index - 3]));
                 } else if (check(Symbol.SUB)) {
                     match(Symbol.SUB);
                     // TODO handle operation
@@ -164,22 +182,42 @@ public class Parser {
             }
         } else if (path == 0) {
             if (check(Symbol.IDENTIFIER)) {
-                Object identifier = identifiers.getOrDefault(line[index], null);
+                String[] identifier = identifiers.getOrDefault(line[index], null);
                 match(Symbol.IDENTIFIER);
                 if (identifier != null) {
                     match(Symbol.DOT);
-                    if (check(Symbol.SEND)) {
-                        match(Symbol.SEND);
-                        match(Symbol.STRING);
-                    } else if (check(Symbol.RECEIVE)) {
-                        match(Symbol.RECEIVE);
+                    if (identifier[0].equals(DatagramSocket.class.toString())) {
+                        if (check(Symbol.SEND)) {
+                            if (identifier[0].equals(DatagramSocket.class.toString())) {
+                                match(Symbol.SEND);
+                                match(Symbol.STRING);
+                            } else {
+                                try {
+                                    throw new NoSuchMethodException("UDP Client does not have such a method.");
+                                } catch (NoSuchMethodException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        } else if (check(Symbol.RECEIVE)) {
+                            if (identifier[0].equals(DatagramSocket.class.toString())) {
+                                match(Symbol.RECEIVE);
+                                identifierIndex++;
+                                BytecodeGenerator.receiveUDP(identifierIndex, Integer.parseInt(identifier[1]));
+                            } else {
+                                try {
+                                    throw new NoSuchMethodException("UDP Server does not have such a method.");
+                                } catch (NoSuchMethodException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
                     }
                 } else {
                     throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
                 }
             }
         } else {
-            throw new IllegalArgumentException("Unexpected tokens. Invalid expression received.");
+            throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
         }
     }
 

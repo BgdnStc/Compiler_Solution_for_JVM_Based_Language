@@ -1,0 +1,2 @@
+Socket h = UDPServer @ 7777
+h.receive
