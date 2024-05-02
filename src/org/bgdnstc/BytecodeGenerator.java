@@ -7,6 +7,7 @@ import org.objectweb.asm.Type;
 import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -92,25 +93,39 @@ public class BytecodeGenerator {
 //        }
     }
 
-    static void sendUDP() {
-
-    }
-
-    static void receiveUDP(int identifierIndex, int socketIndex) {
-        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
-        mv.visitInsn(DUP);
-        mv.visitIntInsn(SIPUSH, 256);
-        mv.visitIntInsn(NEWARRAY, T_BYTE);
-        mv.visitIntInsn(SIPUSH, 256);
+    static void sendUDP(int identifierIndex, int socketIndex, String message, int port) {
         try {
-            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class)), false);
+            mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
+            mv.visitInsn(DUP);
+            pushConstantLdc(message);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "getBytes", Type.getMethodDescriptor(String.class.getMethod("getBytes")), false);
+            pushConstantLdc(message);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "getBytes", Type.getMethodDescriptor(String.class.getMethod("getBytes")), false);
+            mv.visitInsn(ARRAYLENGTH);
+            pushConstantLdc("localhost");
+            mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
+            mv.visitIntInsn(SIPUSH, port);
+            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class, InetAddress.class, int.class)), false);
             mv.visitVarInsn(ASTORE, identifierIndex);
+            mv.visitVarInsn(ALOAD, socketIndex);
+            mv.visitVarInsn(ALOAD, identifierIndex);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(DatagramSocket.class), "send", Type.getMethodDescriptor(DatagramSocket.class.getMethod("send", DatagramPacket.class)), false);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        mv.visitVarInsn(ALOAD, socketIndex);
-        mv.visitVarInsn(ALOAD, identifierIndex);
+    }
+
+    static void receiveUDP(int identifierIndex, int socketIndex) {
         try {
+            mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
+            mv.visitInsn(DUP);
+            mv.visitIntInsn(SIPUSH, 256);
+            mv.visitIntInsn(NEWARRAY, T_BYTE);
+            mv.visitIntInsn(SIPUSH, 256);
+            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class)), false);
+            mv.visitVarInsn(ASTORE, identifierIndex);
+            mv.visitVarInsn(ALOAD, socketIndex);
+            mv.visitVarInsn(ALOAD, identifierIndex);
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(DatagramSocket.class), "receive", Type.getMethodDescriptor(DatagramSocket.class.getMethod("receive", DatagramPacket.class)), false);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);

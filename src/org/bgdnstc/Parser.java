@@ -1,6 +1,5 @@
 package org.bgdnstc;
 
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -9,7 +8,10 @@ import java.util.Scanner;
 public class Parser {
     private static int index = 0;
     private static String[] line = null;
+    // identifier, {class, identifier index}
     private static final HashMap<String, String[]> identifiers = new HashMap<>();
+    // identifier, {port, address}
+    private static final HashMap<String, String[]> sockets = new HashMap<>();
     private static Integer identifierIndex = 0;
 
     private Parser() {
@@ -130,15 +132,19 @@ public class Parser {
                 match(Symbol.UDP_SERVER);
                 match(Symbol.AT);
                 match(Symbol.INT);
+                sockets.put(line[1], new String[]{line[index - 1]});
                 BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), identifierIndex);
             } else if (check(Symbol.UDP_CLIENT)) {
                 match(Symbol.UDP_CLIENT);
                 match(Symbol.AT);
                 match(Symbol.INT);
+                sockets.put(line[1], new String[]{line[index - 1]});
+                BytecodeGenerator.createClientSocket(Integer.parseInt(line[index - 1]), identifierIndex);
             } else {
                 throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
             }
         } else if (path == 2) {
+            // int value or int operation with storing the result into a variable
             match(Symbol.INT);
             if (line.length == index) {
                 BytecodeGenerator.pushByteInt(Integer.parseInt(line[index - 1]));
@@ -191,6 +197,8 @@ public class Parser {
                             if (identifier[0].equals(DatagramSocket.class.toString())) {
                                 match(Symbol.SEND);
                                 match(Symbol.STRING);
+                                identifierIndex++;
+                                BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index -1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]));
                             } else {
                                 try {
                                     throw new NoSuchMethodException("UDP Client does not have such a method.");

@@ -1,2 +1,2 @@
-Socket h = UDPServer @ 7777
-h.receive
+Socket h = UDPClient @ 7777
+h.send "message"
