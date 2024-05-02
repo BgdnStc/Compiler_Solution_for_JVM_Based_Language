@@ -1,39 +1,55 @@
 package org.bgdnstc;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Tokenizer {
 
     public static String[] tokenize(String line) {
         StringBuilder token = new StringBuilder();
         ArrayList<String> tokens = new ArrayList<>();
-        char[] inputChars = line.toCharArray();
-        for (char c : inputChars) {
-            if (c == ' ') {
-                tokens.add(token.toString());
-                token.setLength(0);
-            } else if (c == '.') {
-                tokens.add(token.toString());
-                tokens.add(".");
-                token.setLength(0);
-            } else if (c == '(') {
-                tokens.add(token.toString());
-                tokens.add("(");
-                token.setLength(0);
-            } else if (c == ')') {
-                tokens.add(token.toString());
-                tokens.add(")");
-                token.setLength(0);
-            } else if (c == '{') {
-                tokens.add(token.toString());
-                tokens.add("{");
-                token.setLength(0);
-            } else if (c == '}') {
-                tokens.add(token.toString());
-                tokens.add("}");
-                token.setLength(0);
-            } else {
-                token.append(c);
+        Scanner scanner = new Scanner(line).useDelimiter("");
+        while(scanner.hasNext()) {
+            String current = scanner.next();
+            switch (current) {
+                case "\"" -> {
+                    token.setLength(0);
+                    token.append(current);
+                    do {
+                        current = scanner.next();
+                        token.append(current);
+                    } while (!current.equals("\""));
+                }
+                case " " -> {
+                    tokens.add(token.toString());
+                    token.setLength(0);
+                }
+                case "." -> {
+                    tokens.add(token.toString());
+                    tokens.add(".");
+                    token.setLength(0);
+                }
+                case "(" -> {
+                    tokens.add(token.toString());
+                    tokens.add("(");
+                    token.setLength(0);
+                }
+                case ")" -> {
+                    tokens.add(token.toString());
+                    tokens.add(")");
+                    token.setLength(0);
+                }
+                case "{" -> {
+                    tokens.add(token.toString());
+                    tokens.add("{");
+                    token.setLength(0);
+                }
+                case "}" -> {
+                    tokens.add(token.toString());
+                    tokens.add("}");
+                    token.setLength(0);
+                }
+                default -> token.append(current);
             }
         }
         tokens.add(token.toString());

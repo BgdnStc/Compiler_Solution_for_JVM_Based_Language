@@ -1,2 +1,2 @@
 Socket s2 = UDPClient @ 7777
-s2.send "hello"
+s2.send "hello from the client"

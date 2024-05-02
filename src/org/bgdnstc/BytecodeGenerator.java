@@ -71,8 +71,8 @@ public class BytecodeGenerator {
         mv.visitInsn(DUP);
         try {
             if(socket != null) {
-                mv.visitIntInsn(SIPUSH, socket);
-                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class)), false);
+//                mv.visitIntInsn(SIPUSH, socket);
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
             } else {
                 mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
             }
