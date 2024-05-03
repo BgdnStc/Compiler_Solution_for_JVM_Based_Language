@@ -10,6 +10,7 @@ public class Main {
 //        TODO:
 //        handle float operations
 //        allow resigning a variable
+//        fix case in which integer variables are saved as objects
 
 
 //        Parser.parse(args[0]);
