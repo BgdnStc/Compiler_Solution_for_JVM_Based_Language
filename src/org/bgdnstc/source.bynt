@@ -1,3 +1,4 @@
-Socket s = UDPServer @ 7777
-print 6 9 MUL
-print s.receive
+Socket s1 = UDPServer @ 8888
+print 21 69 ADD
+print s1.receive
+print 2.1 6.9 MUL

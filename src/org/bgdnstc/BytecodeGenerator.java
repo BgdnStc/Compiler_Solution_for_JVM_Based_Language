@@ -38,6 +38,10 @@ public class BytecodeGenerator {
         mv.visitVarInsn(ISTORE, index);
     }
 
+    static void storeFloat(int index) {
+        mv.visitVarInsn(FSTORE, index);
+    }
+
     static void addIntegers(int firstOperand, int secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
@@ -66,6 +70,24 @@ public class BytecodeGenerator {
         mv.visitLdcInsn(firstOperand);
         mv.visitLdcInsn(secondOperand);
         mv.visitInsn(FADD);
+    }
+
+    static void subtractFloats(float firstOperand, float secondOperand) {
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(FSUB);
+    }
+
+    static void multiplyFloats(float firstOperand, float secondOperand) {
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(FMUL);
+    }
+
+    static void divideFloats(float firstOperand, float secondOperand) {
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(FDIV);
     }
 
     static void createServerSocket(Integer socket, int index) {
@@ -157,6 +179,14 @@ public class BytecodeGenerator {
     static void printInvokeVirtualInt() {
         try {
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", int.class)), false);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void printInvokeVirtualFloat() {
+        try {
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", float.class)), false);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

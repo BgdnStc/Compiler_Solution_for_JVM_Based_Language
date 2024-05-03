@@ -109,6 +109,12 @@ public class Parser {
             match(Symbol.EQUALS);
             identifiers.put(line[1], new String[]{int.class.toString(), (++identifierIndex).toString()});
             expression(2);
+        } else if (check(Symbol.TYPE_FLOAT)) {
+            match(Symbol.TYPE_FLOAT);
+            match(Symbol.IDENTIFIER);
+            match(Symbol.EQUALS);
+            identifiers.put(line[1], new String[]{float.class.toString(), (++identifierIndex).toString()});
+            expression(6);
         } else if (check(Symbol.INT)) {
             expression(3);
         } else if (check(Symbol.IDENTIFIER)) {
@@ -120,8 +126,11 @@ public class Parser {
                 BytecodeGenerator.printGetStatic();
                 expression(3);
                 BytecodeGenerator.printInvokeVirtualInt();
+            } else if (check(Symbol.FLOAT)) {
+                BytecodeGenerator.printGetStatic();
+                expression(7);
+                BytecodeGenerator.printInvokeVirtualFloat();
             } else if (check(Symbol.IDENTIFIER)) {
-
                 expression(5);
                 BytecodeGenerator.printInvokeVirtualString();
             }
@@ -151,7 +160,7 @@ public class Parser {
             // int value or int operation with storing the result into a variable
             match(Symbol.INT);
             if (line.length == index) {
-                BytecodeGenerator.pushByteInt(Integer.parseInt(line[index - 1]));
+                BytecodeGenerator.pushShort(Integer.parseInt(line[index - 1]));
                 BytecodeGenerator.storeInt(identifierIndex);
             } else if (check(Symbol.INT)) {
                 match(Symbol.INT);
@@ -179,7 +188,7 @@ public class Parser {
             // int value or int operation without storing the result into a variable
             match(Symbol.INT);
             if (line.length == index) {
-                BytecodeGenerator.pushByteInt(Integer.parseInt(line[index - 1]));
+                BytecodeGenerator.pushShort(Integer.parseInt(line[index - 1]));
             } else if (check(Symbol.INT)) {
                 match(Symbol.INT);
                 if (check(Symbol.ADD)) {
@@ -245,6 +254,57 @@ public class Parser {
             if (line[index - 1].equals("receive")) {
                 BytecodeGenerator.printGetStatic();
                 BytecodeGenerator.packetToString(identifierIndex);
+            }
+        } else if (path == 6) {
+            // float value or float operation with storing the result into a variable
+            match(Symbol.FLOAT);
+            if (line.length == index) {
+                BytecodeGenerator.pushConstantLdc(Float.parseFloat(line[index - 1]));
+                BytecodeGenerator.storeFloat(identifierIndex);
+            } else if (check(Symbol.FLOAT)) {
+                match(Symbol.FLOAT);
+                if (check(Symbol.ADD)) {
+                    match(Symbol.ADD);
+                    BytecodeGenerator.addFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                    BytecodeGenerator.storeFloat(identifierIndex);
+                } else if (check(Symbol.SUB)) {
+                    match(Symbol.SUB);
+                    BytecodeGenerator.subtractFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                    BytecodeGenerator.storeFloat(identifierIndex);
+                } else if (check(Symbol.MUL)) {
+                    match(Symbol.MUL);
+                    BytecodeGenerator.multiplyFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                    BytecodeGenerator.storeFloat(identifierIndex);
+                } else if (check(Symbol.DIV)) {
+                    match((Symbol.DIV));
+                    BytecodeGenerator.divideFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                    BytecodeGenerator.storeFloat(identifierIndex);
+                } else {
+                    match(nextSymbol());
+                }
+            }
+        } else if (path == 7) {
+            // float value or float operation without storing the result into a variable
+            match(Symbol.FLOAT);
+            if (line.length == index) {
+                BytecodeGenerator.pushConstantLdc(Float.parseFloat(line[index - 1]));
+            } else if (check(Symbol.FLOAT)) {
+                match(Symbol.FLOAT);
+                if (check(Symbol.ADD)) {
+                    match(Symbol.ADD);
+                    BytecodeGenerator.addFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                } else if (check(Symbol.SUB)) {
+                    match(Symbol.SUB);
+                    BytecodeGenerator.subtractFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                } else if (check(Symbol.MUL)) {
+                    match(Symbol.MUL);
+                    BytecodeGenerator.multiplyFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                } else if (check(Symbol.DIV)) {
+                    match((Symbol.DIV));
+                    BytecodeGenerator.divideFloats(Float.parseFloat(line[index - 3]), Float.parseFloat(line[index - 2]));
+                } else {
+                    match(nextSymbol());
+                }
             }
         } else {
             throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
