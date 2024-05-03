@@ -1,2 +1,2 @@
 Socket s1 = UDPServer @ 7777
-s1.receive
+print s1.receive

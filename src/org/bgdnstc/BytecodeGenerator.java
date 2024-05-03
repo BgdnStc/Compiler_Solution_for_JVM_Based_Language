@@ -44,6 +44,24 @@ public class BytecodeGenerator {
         mv.visitInsn(IADD);
     }
 
+    static void subtractIntegers(int firstOperand, int secondOperand) {
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(ISUB);
+    }
+
+    static void multiplyIntegers(int firstOperand, int secondOperand) {
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(IMUL);
+    }
+
+    static void divideIntegers(int firstOperand, int secondOperand) {
+        pushConstantLdc(firstOperand);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(IDIV);
+    }
+
     static void addFloats(float firstOperand, float secondOperand) {
         mv.visitLdcInsn(firstOperand);
         mv.visitLdcInsn(secondOperand);
@@ -139,6 +157,31 @@ public class BytecodeGenerator {
     static void printInvokeVirtualInt() {
         try {
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", int.class)), false);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void printInvokeVirtualString() {
+        try {
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", String.class)), false);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void loadInteger(int identifierIndex) {
+        mv.visitVarInsn(ILOAD, identifierIndex);
+    }
+
+    static void packetToString(int packetIndex) {
+        try {
+            mv.visitTypeInsn(NEW, Type.getInternalName(String.class));
+            mv.visitInsn(DUP);
+            mv.visitVarInsn(ALOAD, packetIndex);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(DatagramPacket.class), "getData", Type.getMethodDescriptor(DatagramPacket.class.getMethod("getData")), false);
+            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(String.class), "<init>", Type.getConstructorDescriptor(String.class.getConstructor(byte[].class)), false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "trim", Type.getMethodDescriptor(String.class.getMethod("trim")), false);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

@@ -112,7 +112,7 @@ public class Parser {
         } else if (check(Symbol.INT)) {
             expression(3);
         } else if (check(Symbol.IDENTIFIER)) {
-            expression(0);
+            expression(4);
         } else if (check(Symbol.PRINT)) {
             match(Symbol.PRINT);
             if (check(Symbol.INT)) {
@@ -120,6 +120,10 @@ public class Parser {
                 BytecodeGenerator.printGetStatic();
                 expression(3);
                 BytecodeGenerator.printInvokeVirtualInt();
+            } else if (check(Symbol.IDENTIFIER)) {
+
+                expression(5);
+                BytecodeGenerator.printInvokeVirtualString();
             }
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
@@ -153,20 +157,26 @@ public class Parser {
                 match(Symbol.INT);
                 if (check(Symbol.ADD)) {
                     match(Symbol.ADD);
-                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 2]), Integer.parseInt(line[index - 3]));
+                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
                     BytecodeGenerator.storeInt(identifierIndex);
                 } else if (check(Symbol.SUB)) {
                     match(Symbol.SUB);
-                    // TODO handle operation
+                    BytecodeGenerator.subtractIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
+                    BytecodeGenerator.storeInt(identifierIndex);
                 } else if (check(Symbol.MUL)) {
                     match(Symbol.MUL);
+                    BytecodeGenerator.multiplyIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
+                    BytecodeGenerator.storeInt(identifierIndex);
                 } else if (check(Symbol.DIV)) {
                     match((Symbol.DIV));
+                    // TODO handle storing when result is not integer
+                    BytecodeGenerator.divideIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
                 } else {
                     match(nextSymbol());
                 }
             }
         } else if (path == 3) {
+            // int value or int operation without storing the result into a variable
             match(Symbol.INT);
             if (line.length == index) {
                 BytecodeGenerator.pushByteInt(Integer.parseInt(line[index - 1]));
@@ -174,25 +184,27 @@ public class Parser {
                 match(Symbol.INT);
                 if (check(Symbol.ADD)) {
                     match(Symbol.ADD);
-                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 2]), Integer.parseInt(line[index - 3]));
+                    BytecodeGenerator.addIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
                 } else if (check(Symbol.SUB)) {
                     match(Symbol.SUB);
-                    // TODO handle operation
+                    BytecodeGenerator.subtractIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
                 } else if (check(Symbol.MUL)) {
                     match(Symbol.MUL);
+                    BytecodeGenerator.multiplyIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
                 } else if (check(Symbol.DIV)) {
                     match((Symbol.DIV));
+                    BytecodeGenerator.divideIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
                 } else {
                     match(nextSymbol());
                 }
             }
-        } else if (path == 0) {
+        } else if (path == 4) {
             if (check(Symbol.IDENTIFIER)) {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
                 match(Symbol.IDENTIFIER);
                 if (identifier != null) {
-                    match(Symbol.DOT);
                     if (identifier[0].equals(DatagramSocket.class.toString())) {
+                        match(Symbol.DOT);
                         if (check(Symbol.SEND)) {
                             if (identifier[0].equals(DatagramSocket.class.toString())) {
                                 match(Symbol.SEND);
@@ -219,10 +231,20 @@ public class Parser {
                                 }
                             }
                         }
+                    } else if (identifier[0].equals(int.class.toString())) {
+                        BytecodeGenerator.printGetStatic();
+                        BytecodeGenerator.loadInteger(Integer.parseInt(identifier[1]));
                     }
                 } else {
                     throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
                 }
+            }
+        } else if(path == 5) {
+            // for printing variables
+            expression(4);
+            if (line[index - 1].equals("receive")) {
+                BytecodeGenerator.printGetStatic();
+                BytecodeGenerator.packetToString(identifierIndex);
             }
         } else {
             throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
