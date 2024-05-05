@@ -1,6 +1,7 @@
 package org.bgdnstc;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
@@ -215,6 +216,16 @@ public class BytecodeGenerator {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static Label visitLabel() {
+        Label label = new Label();
+        mv.visitLabel(label);
+        return label;
+    }
+
+    static void gotoLabel(Label label) {
+        mv.visitJumpInsn(GOTO, label);
     }
 
     static byte[] closeClass() {

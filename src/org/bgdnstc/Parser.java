@@ -134,6 +134,12 @@ public class Parser {
                 expression(5);
                 BytecodeGenerator.printInvokeVirtualString();
             }
+        } else if(check(Symbol.WHILE)) {
+            match(Symbol.WHILE);
+            match(Symbol.L_PARENTHESIS);
+//            expression();
+            match(Symbol.R_PARENTHESIS);
+            match(Symbol.L_BRACKET);
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
         }
