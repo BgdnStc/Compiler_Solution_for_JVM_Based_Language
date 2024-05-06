@@ -1,4 +1,6 @@
 Socket s1 = UDPServer @ 8888
-print 21 69 ADD
 float f1 = 2.1 6.9 MUL
-print s1.receive
+loop {
+    print 21 69 ADD
+    print s1.receive
+}

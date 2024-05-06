@@ -32,31 +32,43 @@ public class Tokenizer {
                         } while (!current.equals("\""));
                     }
                     case " " -> {
-                        tokens.add(token.toString());
+                        if ((!token.isEmpty())) {
+                            tokens.add(token.toString());
+                        }
                         token.setLength(0);
                     }
                     case "." -> {
-                        tokens.add(token.toString());
+                        if ((!token.isEmpty())) {
+                            tokens.add(token.toString());
+                        }
                         tokens.add(".");
                         token.setLength(0);
                     }
                     case "(" -> {
-                        tokens.add(token.toString());
+                        if ((!token.isEmpty())) {
+                            tokens.add(token.toString());
+                        }
                         tokens.add("(");
                         token.setLength(0);
                     }
                     case ")" -> {
-                        tokens.add(token.toString());
+                        if ((!token.isEmpty())) {
+                            tokens.add(token.toString());
+                        }
                         tokens.add(")");
                         token.setLength(0);
                     }
                     case "{" -> {
-                        tokens.add(token.toString());
+                        if ((!token.isEmpty())) {
+                            tokens.add(token.toString());
+                        }
                         tokens.add("{");
                         token.setLength(0);
                     }
                     case "}" -> {
-                        tokens.add(token.toString());
+                        if ((!token.isEmpty())) {
+                            tokens.add(token.toString());
+                        }
                         tokens.add("}");
                         token.setLength(0);
                     }

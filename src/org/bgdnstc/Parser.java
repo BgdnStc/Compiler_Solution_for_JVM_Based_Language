@@ -1,9 +1,12 @@
 package org.bgdnstc;
 
+import org.objectweb.asm.Label;
+
 import java.net.DatagramSocket;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Parser {
     private static int index = 0;
@@ -13,6 +16,7 @@ public class Parser {
     // identifier, {port, address}
     private static final HashMap<String, String[]> sockets = new HashMap<>();
     private static Integer identifierIndex = 0;
+    private static final Stack<Label> labelStack = new Stack<>();
 
     private Parser() {
     }
@@ -134,12 +138,13 @@ public class Parser {
                 expression(5);
                 BytecodeGenerator.printInvokeVirtualString();
             }
-        } else if(check(Symbol.WHILE)) {
-            match(Symbol.WHILE);
-            match(Symbol.L_PARENTHESIS);
-//            expression();
-            match(Symbol.R_PARENTHESIS);
+        } else if(check(Symbol.LOOP)) {
+            match(Symbol.LOOP);
             match(Symbol.L_BRACKET);
+            labelStack.add(BytecodeGenerator.visitLabel());
+        } else if (check(Symbol.R_BRACKET)) {
+            match(Symbol.R_BRACKET);
+            BytecodeGenerator.gotoLabel(labelStack.pop());
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
         }
