@@ -136,7 +136,6 @@ public class Parser {
                 BytecodeGenerator.printInvokeVirtualFloat();
             } else if (check(Symbol.IDENTIFIER)) {
                 expression(5);
-                BytecodeGenerator.printInvokeVirtualString();
             }
         } else if(check(Symbol.LOOP)) {
             match(Symbol.LOOP);
@@ -189,8 +188,8 @@ public class Parser {
                     BytecodeGenerator.storeInt(identifierIndex);
                 } else if (check(Symbol.DIV)) {
                     match((Symbol.DIV));
-                    // TODO handle storing when result is not integer
                     BytecodeGenerator.divideIntegers(Integer.parseInt(line[index - 3]), Integer.parseInt(line[index - 2]));
+                    BytecodeGenerator.storeFloat(identifierIndex);
                 } else {
                     match(nextSymbol());
                 }
@@ -265,6 +264,9 @@ public class Parser {
             if (line[index - 1].equals("receive")) {
                 BytecodeGenerator.printGetStatic();
                 BytecodeGenerator.packetToString(identifierIndex);
+                BytecodeGenerator.printInvokeVirtualString();
+            } else {
+                BytecodeGenerator.printInvokeVirtualInt();
             }
         } else if (path == 6) {
             // float value or float operation with storing the result into a variable

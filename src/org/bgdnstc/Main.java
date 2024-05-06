@@ -7,9 +7,9 @@ public class Main {
         Parser.parse("src/org/bgdnstc/UDPClient.bynt");
 
 //        TODO:
-//        handle storing float after integer division
+//        while loops
 //        allow resigning a variable
-//        fix case in which integer variables are saved as objects
+//        fix case in which integer variables are saved as objects (maybe fixed ?)
 
 
 //        Parser.parse(args[0]);
