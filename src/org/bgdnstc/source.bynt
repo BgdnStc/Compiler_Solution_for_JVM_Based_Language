@@ -1,5 +1,6 @@
 Socket s1 = UDPServer @ 8888
 float f1 = 2.1 6.9 MUL
+string s = "This is a HELLO message"
 loop {
     print 21 69 ADD
     print s1.receive

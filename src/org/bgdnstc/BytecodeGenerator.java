@@ -43,6 +43,10 @@ public class BytecodeGenerator {
         mv.visitVarInsn(FSTORE, index);
     }
 
+    static void storeString(int index) {
+        mv.visitVarInsn(ASTORE, index);
+    }
+
     static void addIntegers(int firstOperand, int secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);

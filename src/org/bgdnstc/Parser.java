@@ -119,6 +119,12 @@ public class Parser {
             match(Symbol.EQUALS);
             identifiers.put(line[1], new String[]{float.class.toString(), (++identifierIndex).toString()});
             expression(6);
+        } else if (check(Symbol.TYPE_STRING)) {
+            match(Symbol.TYPE_STRING);
+            match(Symbol.IDENTIFIER);
+            match(Symbol.EQUALS);
+            identifiers.put(line[1], new String[]{String.class.toString(), (++identifierIndex).toString()});
+            expression(8);
         } else if (check(Symbol.INT)) {
             expression(3);
         } else if (check(Symbol.IDENTIFIER)) {
@@ -134,6 +140,10 @@ public class Parser {
                 BytecodeGenerator.printGetStatic();
                 expression(7);
                 BytecodeGenerator.printInvokeVirtualFloat();
+            } else if (check(Symbol.STRING)) {
+                BytecodeGenerator.printGetStatic();
+                expression(9);
+                BytecodeGenerator.printInvokeVirtualString();
             } else if (check(Symbol.IDENTIFIER)) {
                 expression(5);
             }
@@ -319,6 +329,15 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
+        } else if (path == 8) {
+            // string value with storing the value
+            match(Symbol.STRING);
+            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
+            BytecodeGenerator.storeString(identifierIndex);
+        } else if (path == 9) {
+            // string value without storing the value
+            match(Symbol.STRING);
+            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
         } else {
             throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
         }
