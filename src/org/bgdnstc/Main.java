@@ -7,8 +7,8 @@ public class Main {
         Parser.parse("src/org/bgdnstc/UDPClient.bynt");
 
 //        TODO:
+//        path 1, "index - 1" handle when there is a address after the port
 //        while loops
-//        allow resigning a variable
 //        fix case in which integer variables are saved as objects (maybe fixed ?)
 
 

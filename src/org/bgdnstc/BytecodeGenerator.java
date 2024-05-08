@@ -160,6 +160,28 @@ public class BytecodeGenerator {
         }
     }
 
+    static void sendIdentifierUDP(int identifierIndex, int socketIndex, int messageIndex, int port) {
+        try {
+            mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
+            mv.visitInsn(DUP);
+            loadReference(messageIndex);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "getBytes", Type.getMethodDescriptor(String.class.getMethod("getBytes")), false);
+            loadReference(messageIndex);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "getBytes", Type.getMethodDescriptor(String.class.getMethod("getBytes")), false);
+            mv.visitInsn(ARRAYLENGTH);
+            pushConstantLdc("localhost");
+            mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
+            mv.visitIntInsn(SIPUSH, port);
+            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class, InetAddress.class, int.class)), false);
+            mv.visitVarInsn(ASTORE, identifierIndex);
+            mv.visitVarInsn(ALOAD, socketIndex);
+            mv.visitVarInsn(ALOAD, identifierIndex);
+            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(DatagramSocket.class), "send", Type.getMethodDescriptor(DatagramSocket.class.getMethod("send", DatagramPacket.class)), false);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     static void receiveUDP(int identifierIndex, int socketIndex) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
@@ -207,6 +229,14 @@ public class BytecodeGenerator {
 
     static void loadInteger(int identifierIndex) {
         mv.visitVarInsn(ILOAD, identifierIndex);
+    }
+
+    static void loadFloat(int identifierIndex) {
+        mv.visitVarInsn(FLOAD, identifierIndex);
+    }
+
+    static void loadReference(int identifierIndex) {
+        mv.visitVarInsn(ALOAD, identifierIndex);
     }
 
     static void packetToString(int packetIndex) {
