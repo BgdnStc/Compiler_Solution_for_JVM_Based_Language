@@ -7,5 +7,5 @@ public enum Symbol {
     RECEIVE, SEND,
     DOT, L_BRACKET, R_BRACKET, L_PARENTHESIS, R_PARENTHESIS, AT,
     IDENTIFIER,
-    EOL, EOF
+    EOL
 }
