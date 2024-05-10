@@ -95,50 +95,49 @@ public class BytecodeGenerator {
         mv.visitInsn(FDIV);
     }
 
-    static void createServerSocket(Integer socket, int index) {
-        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
-        mv.visitInsn(DUP);
+    static void createServerSocket(Integer socket, String address, int index) {
         try {
-            if(socket != null) {
+            mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
+            mv.visitInsn(DUP);
+            if(address != null && socket != null) {
+                mv.visitIntInsn(SIPUSH, socket);
+                pushConstantLdc(address);
+                mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class, InetAddress.class)), false);
+            } else if (address == null && socket != null) {
                 mv.visitIntInsn(SIPUSH, socket);
                 mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class)), false);
             } else {
                 mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
             }
+            mv.visitVarInsn(ASTORE, index);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        mv.visitVarInsn(ASTORE, index);
     }
 
-    static void createClientSocket(Integer socket, int index) {
+    static void createClientSocket(Integer socket, String address, int index) {
         mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
         mv.visitInsn(DUP);
         try {
-            if(socket != null) {
-//                mv.visitIntInsn(SIPUSH, socket);
-                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
+            if(address != null && socket != null) {
+                mv.visitIntInsn(SIPUSH, socket);
+                pushConstantLdc(address);
+                mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class, InetAddress.class)), false);
+            } else if (address == null && socket != null) {
+                mv.visitIntInsn(SIPUSH, socket);
+                mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor(int.class)), false);
             } else {
                 mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramSocket.class), "<init>", Type.getConstructorDescriptor(DatagramSocket.class.getConstructor()), false);
             }
+            mv.visitVarInsn(ASTORE, index);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        mv.visitVarInsn(ASTORE, index);
-//        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
-//        mv.visitInsn(DUP);
-//        mv.visitIntInsn(SIPUSH, 256);
-//        mv.visitIntInsn(NEWARRAY, T_BYTE);
-//        mv.visitIntInsn(SIPUSH, 256);
-//        try {
-//            mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class)), false);
-//            mv.visitVarInsn(ASTORE, index + 1);
-//        } catch (NoSuchMethodException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
-    static void sendUDP(int identifierIndex, int socketIndex, String message, int port) {
+    static void sendUDP(int identifierIndex, int socketIndex, String message, int port, String address) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
             mv.visitInsn(DUP);
@@ -147,7 +146,7 @@ public class BytecodeGenerator {
             pushConstantLdc(message);
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "getBytes", Type.getMethodDescriptor(String.class.getMethod("getBytes")), false);
             mv.visitInsn(ARRAYLENGTH);
-            pushConstantLdc("localhost");
+            pushConstantLdc(address != null ? address : "localhost");
             mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
             mv.visitIntInsn(SIPUSH, port);
             mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class, InetAddress.class, int.class)), false);
@@ -160,7 +159,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static void sendIdentifierUDP(int identifierIndex, int socketIndex, int messageIndex, int port) {
+    static void sendIdentifierUDP(int identifierIndex, int socketIndex, int messageIndex, int port, String address) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
             mv.visitInsn(DUP);
@@ -169,7 +168,7 @@ public class BytecodeGenerator {
             loadReference(messageIndex);
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(String.class), "getBytes", Type.getMethodDescriptor(String.class.getMethod("getBytes")), false);
             mv.visitInsn(ARRAYLENGTH);
-            pushConstantLdc("localhost");
+            pushConstantLdc(address != null ? address : "localhost");
             mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
             mv.visitIntInsn(SIPUSH, port);
             mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(DatagramPacket.class), "<init>", Type.getConstructorDescriptor(DatagramPacket.class.getConstructor(byte[].class, int.class, InetAddress.class, int.class)), false);

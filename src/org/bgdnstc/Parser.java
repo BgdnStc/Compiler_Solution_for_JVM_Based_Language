@@ -35,7 +35,12 @@ public class Parser {
     }
 
     private static Symbol nextSymbol() {
-        String token = line[index];
+        String token;
+        if (index < line.length) {
+            token = line[index];
+        } else {
+            token = null;
+        }
         if (token != null) {
             switch (token) {
                 case "=":
@@ -96,7 +101,6 @@ public class Parser {
                     }
             }
         } else {
-            index = 0;
             return Symbol.EOL;
         }
     }
@@ -166,14 +170,26 @@ public class Parser {
                 match(Symbol.UDP_SERVER);
                 match(Symbol.AT);
                 match(Symbol.INT);
-                sockets.put(line[1], new String[]{line[index - 1]});
-                BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), identifierIndex);
+                if (!check(Symbol.EOL)) {
+                    match(Symbol.STRING);
+                    sockets.put(line[1], new String[]{line[index - 2], line[index - 1]});
+                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 2]), line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
+                } else {
+                    sockets.put(line[1], new String[]{line[index - 1]});
+                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), null, identifierIndex);
+                }
             } else if (check(Symbol.UDP_CLIENT)) {
                 match(Symbol.UDP_CLIENT);
                 match(Symbol.AT);
                 match(Symbol.INT);
-                sockets.put(line[1], new String[]{line[index - 1]});
-                BytecodeGenerator.createClientSocket(Integer.parseInt(line[index - 1]), identifierIndex);
+                if (!check(Symbol.EOL)) {
+                    match(Symbol.STRING);
+                    sockets.put(line[1], new String[]{line[index - 2], line[index - 1]});
+                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 2]), line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
+                } else {
+                    sockets.put(line[1], new String[]{line[index - 1]});
+                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), null, identifierIndex);
+                }
             } else {
                 throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
             }
@@ -243,13 +259,21 @@ public class Parser {
                                     if (check(Symbol.STRING)) {
                                         match(Symbol.STRING);
                                         identifierIndex++;
-                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]));
+                                        if (sockets.get(line[index - 4]).length > 1) {
+                                            BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
+                                        } else {
+                                            BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
+                                        }
                                     } else if (check(Symbol.IDENTIFIER)) {
                                         match(Symbol.IDENTIFIER);
                                         String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
                                         if (stringIdentifier != null && stringIdentifier[0].equals(String.class.toString())) {
                                             identifierIndex++;
-                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]));
+                                            if (sockets.get(line[index - 4]).length > 1) {
+                                                BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
+                                            } else {
+                                                BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
+                                            }
                                         } else {
                                             throw new IllegalArgumentException("Expected string / string identifier after 'send' method");
                                         }
@@ -392,13 +416,21 @@ public class Parser {
                                 if (check(Symbol.STRING)) {
                                     match(Symbol.STRING);
                                     identifierIndex++;
-                                    BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]));
+                                    if (sockets.get(line[index - 4]).length > 1) {
+                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, line[index - 4].length() - 1));
+                                    } else {
+                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
+                                    }
                                 } else if (check(Symbol.IDENTIFIER)) {
                                     match(Symbol.IDENTIFIER);
                                     String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
                                     if (stringIdentifier != null && stringIdentifier[0].equals(String.class.toString())) {
                                         identifierIndex++;
-                                        BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]));
+                                        if (sockets.get(line[index - 4]).length > 1) {
+                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
+                                        } else {
+                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
+                                        }
                                     } else {
                                         throw new IllegalArgumentException("Expected string / string identifier after 'send' method");
                                     }
