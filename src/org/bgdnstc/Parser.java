@@ -29,6 +29,7 @@ public class Parser {
 
     // parse method dictates the execution flow of the compiler
     public static void parse(String path) {
+        identifierIndex = 0;
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
         final String className = WriterClass.pathToClassName(path);
         BytecodeGenerator.createClass(className);

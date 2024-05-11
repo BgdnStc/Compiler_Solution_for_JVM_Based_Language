@@ -1,0 +1,2 @@
+Socket serverSocket = UDPServer @ 7777
+print serverSocket.receive

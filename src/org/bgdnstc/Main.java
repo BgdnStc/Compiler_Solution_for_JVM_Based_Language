@@ -2,9 +2,9 @@ package org.bgdnstc;
 
 public class Main {
     public static void main(String[] args) {
-        Parser.parse("src/org/bgdnstc/source.bynt");
-        Parser.parse("src/org/bgdnstc/UDPServer.bynt");
-        Parser.parse("src/org/bgdnstc/UDPClient.bynt");
+        Parser.parse("source.bynt");
+        Parser.parse("UDPServer.bynt");
+        Parser.parse("UDPClient.bynt");
 
 //        TODO:
 //        while loops

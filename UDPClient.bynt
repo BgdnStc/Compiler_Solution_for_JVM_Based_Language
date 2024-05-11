@@ -1,0 +1,2 @@
+Socket clientSocket = UDPClient @ 7777
+clientSocket.send "message from client"
