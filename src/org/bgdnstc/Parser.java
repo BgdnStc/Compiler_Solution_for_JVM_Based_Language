@@ -10,18 +10,24 @@ import java.util.Stack;
 import java.util.regex.PatternSyntaxException;
 
 public class Parser {
+    // index of the current token
     private static int index = 0;
+    // current line as token array
     private static String[] line = null;
+    // current available index for variables
+    private static Integer identifierIndex = 0;
     // [ identifier, {class, identifier index} ]
     private static final HashMap<String, String[]> identifiers = new HashMap<>();
     // [ identifier, {port, address} ]
     private static final HashMap<String, String[]> sockets = new HashMap<>();
-    private static Integer identifierIndex = 0;
+    // stack of labels, last label is the current loop
     private static final Stack<Label> labelStack = new Stack<>();
 
+    // private constructor for prevention instantiation
     private Parser() {
     }
 
+    // parse method dictates the execution flow of the compiler
     public static void parse(String path) {
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
         final String className = WriterClass.pathToClassName(path);
@@ -34,6 +40,7 @@ public class Parser {
         WriterClass.writeClass(className, BytecodeGenerator.closeClass());
     }
 
+    // return the symbol of next token
     private static Symbol nextSymbol() {
         String token;
         if (index < line.length) {
@@ -105,6 +112,7 @@ public class Parser {
         }
     }
 
+    // validates the grammar of the statement
     private static void statement() {
         if (check(Symbol.SOCKET)) {
             match(Symbol.SOCKET);
@@ -164,8 +172,9 @@ public class Parser {
         }
     }
 
-    private static void expression(int path) {
-        if (path == 1) {
+    // validates the grammar of the provided expression
+    private static void expression(int expressionPath) {
+        if (expressionPath == 1) {
             if (check(Symbol.UDP_SERVER)) {
                 match(Symbol.UDP_SERVER);
                 match(Symbol.AT);
@@ -193,7 +202,7 @@ public class Parser {
             } else {
                 throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
             }
-        } else if (path == 2) {
+        } else if (expressionPath == 2) {
             // int value or int operation with storing the result into a variable
             match(Symbol.INT);
             if (line.length == index) {
@@ -221,7 +230,7 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (path == 3) {
+        } else if (expressionPath == 3) {
             // int value or int operation without storing the result into a variable
             match(Symbol.INT);
             if (line.length == index) {
@@ -244,7 +253,7 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (path == 4) {
+        } else if (expressionPath == 4) {
             // checking identifier methods
             if (check(Symbol.IDENTIFIER)) {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
@@ -334,7 +343,7 @@ public class Parser {
                     throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
                 }
             }
-        } else if(path == 5) {
+        } else if(expressionPath == 5) {
             // for printing variables
             expression(10);
             if (line[index - 1].equals("receive")) {
@@ -342,7 +351,7 @@ public class Parser {
                 BytecodeGenerator.packetToString(identifierIndex);
                 BytecodeGenerator.printInvokeVirtualString();
             }
-        } else if (path == 6) {
+        } else if (expressionPath == 6) {
             // float value or float operation with storing the result into a variable
             match(Symbol.FLOAT);
             if (line.length == index) {
@@ -370,7 +379,7 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (path == 7) {
+        } else if (expressionPath == 7) {
             // float value or float operation without storing the result into a variable
             match(Symbol.FLOAT);
             if (line.length == index) {
@@ -393,16 +402,16 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (path == 8) {
+        } else if (expressionPath == 8) {
             // string value with storing the value
             match(Symbol.STRING);
             BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
             BytecodeGenerator.storeString(identifierIndex);
-        } else if (path == 9) {
+        } else if (expressionPath == 9) {
             // string value without storing the value
             match(Symbol.STRING);
             BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
-        } else if (path == 10) {
+        } else if (expressionPath == 10) {
             // called by printing
             if (check(Symbol.IDENTIFIER)) {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
@@ -477,11 +486,13 @@ public class Parser {
         }
     }
 
+    // checks the type of the next symbol
     private static boolean check(Symbol expected) {
         Symbol current = nextSymbol();
         return current.equals(expected);
     }
 
+    // matches the type of the next symbol
     private static void match(Symbol expected) {
         Symbol current = nextSymbol();
         if (current.equals(expected)) {
