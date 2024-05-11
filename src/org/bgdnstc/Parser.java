@@ -23,7 +23,7 @@ public class Parser {
     // stack of labels, last label is the current loop
     private static final Stack<Label> labelStack = new Stack<>();
 
-    // private constructor for prevention instantiation
+    // private constructor for preventing instantiation
     private Parser() {
     }
 
@@ -175,6 +175,7 @@ public class Parser {
     // validates the grammar of the provided expression
     private static void expression(int expressionPath) {
         if (expressionPath == 1) {
+            // socket variable initialisation
             if (check(Symbol.UDP_SERVER)) {
                 match(Symbol.UDP_SERVER);
                 match(Symbol.AT);
