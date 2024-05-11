@@ -17,10 +17,10 @@ public class SourceReader {
             if (byteNetFile.matcher(path.toString()).matches()) {
                 return Files.readString(path);
             } else {
-                throw new InvalidPathException(path.toString().substring(path.toString().lastIndexOf("\\")) , "Invalid file format provided. ByteNet code is stored exclusively in \".bynt\" files. File provided");
+                throw new InvalidPathException(path.toString().substring(path.toString().lastIndexOf("\\")) , "Invalid file format provided. ByteNet code is stored exclusively in \".bynt\" files. Provided file");
             }
         } catch (IOException e) {
-            throw new InvalidPathException(path.toString(), "Invalid path provided. The path should have the root the current content directory or absolute path. Path provided");
+            throw new InvalidPathException(path.toString(), "Invalid path provided. The path should have the root the current content directory or to be an absolute path. Provided path");
         }
     }
 }
