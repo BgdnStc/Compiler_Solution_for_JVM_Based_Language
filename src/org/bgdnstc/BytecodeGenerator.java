@@ -13,8 +13,14 @@ import java.net.InetAddress;
 import static org.objectweb.asm.Opcodes.*;
 
 public class BytecodeGenerator {
+    // ASM ClassWriter instance
     private static ClassWriter cw;
+    // ASM MethodVisitor instance for the main method
     private static MethodVisitor mv;
+
+    // private constructor for preventing instantiation
+    private BytecodeGenerator() {
+    }
 
     static void createClass(String className) {
         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
@@ -117,9 +123,9 @@ public class BytecodeGenerator {
     }
 
     static void createClientSocket(Integer socket, String address, int index) {
-        mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
-        mv.visitInsn(DUP);
         try {
+            mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
+            mv.visitInsn(DUP);
             if(address != null && socket != null) {
                 mv.visitIntInsn(SIPUSH, socket);
                 pushConstantLdc(address);

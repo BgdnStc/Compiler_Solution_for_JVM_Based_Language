@@ -195,10 +195,10 @@ public class Parser {
                 if (!check(Symbol.EOL)) {
                     match(Symbol.STRING);
                     sockets.put(line[1], new String[]{line[index - 2], line[index - 1]});
-                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 2]), line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
+                    BytecodeGenerator.createClientSocket(Integer.parseInt(line[index - 2]), line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
                 } else {
                     sockets.put(line[1], new String[]{line[index - 1]});
-                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), null, identifierIndex);
+                    BytecodeGenerator.createClientSocket(Integer.parseInt(line[index - 1]), null, identifierIndex);
                 }
             } else {
                 throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
