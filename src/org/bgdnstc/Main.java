@@ -7,9 +7,9 @@ public class Main {
         Parser.parse("src/UDPClient.bynt");
 
 //        TODO:
-//        test file path format destination (\ vs /)
+//        test file path format (/ or \\) and its destination
 //        while loops
-//        fix case in which integer variables are saved as objects (maybe fixed ?)
+//        (maybe fixed ?) fix case in which integer variables are saved as objects
 
 //        Parser.parse(args[0]);
 //        for (String path : args) {
