@@ -9,6 +9,8 @@ import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Stack;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -24,7 +26,7 @@ public class BytecodeGenerator {
 
     static void createClass(String className) {
         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        cw.visit(V21, ACC_PUBLIC, className, null, Type.getInternalName(Object.class), null);
+        cw.visit(V21, ACC_PUBLIC + ACC_SUPER, className, null, Type.getInternalName(Object.class), null);
         mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "(" + Type.getDescriptor(String[].class) + ")V", null, null);
         mv.visitCode();
     }
@@ -257,9 +259,18 @@ public class BytecodeGenerator {
         }
     }
 
-    static Label visitLabel() {
+    static Label visitLabel(int localFrameSize, ArrayList<Object> locals) {
+        Object[] localsArray;
         Label label = new Label();
         mv.visitLabel(label);
+        if (localFrameSize < 4) {
+            localsArray = locals.toArray();
+            mv.visitFrame(F_APPEND, localFrameSize, localsArray, 0, null);
+        } else {
+            locals.addFirst(Type.getInternalName(String[].class));
+            localsArray = locals.toArray();
+            mv.visitFrame(F_FULL, localFrameSize, localsArray, 0, null);
+        }
         return label;
     }
 
@@ -267,8 +278,7 @@ public class BytecodeGenerator {
         mv.visitJumpInsn(GOTO, label);
     }
 
-    static byte[] closeClass() {
-        mv.visitInsn(RETURN);
+    static byte[] closeClass(Stack<Label> labelStack) {
         mv.visitEnd();
         mv.visitMaxs(-1, -1);
         cw.visitEnd();

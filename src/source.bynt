@@ -1,11 +1,11 @@
-Socket s1 = UDPServer @ 8888 "localhost"
-float f1 = 2.1 6.9 MUL
-int i1 = 7
-i1 = 9
-string s = "This is a message"
-s = "This is a HELLO message!"
-print s
+string s1 = "l"
+string s = "h"
+int i = 6
+string j = "j"
+string z = "z"
+string x = "x"
+string v = "v"
+string c = "c"
 loop {
-    print 21 69 ADD
-    print s1.send s
+    print i
 }

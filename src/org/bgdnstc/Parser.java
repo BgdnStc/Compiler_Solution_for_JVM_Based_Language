@@ -1,12 +1,12 @@
 package org.bgdnstc;
 
 import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 import java.net.DatagramSocket;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.PatternSyntaxException;
 
 public class Parser {
@@ -17,7 +17,7 @@ public class Parser {
     // current available index for variables
     private static Integer identifierIndex = 0;
     // [ identifier, {class, identifier index} ]
-    private static final HashMap<String, String[]> identifiers = new HashMap<>();
+    private static final LinkedHashMap<String, String[]> identifiers = new LinkedHashMap<>();
     // [ identifier, {port, address} ]
     private static final HashMap<String, String[]> sockets = new HashMap<>();
     // stack of labels, last label is the current loop
@@ -38,7 +38,7 @@ public class Parser {
             line = Tokenizer.tokenize(scanner.nextLine());
             statement();
         }
-        WriterClass.writeClass(className, BytecodeGenerator.closeClass());
+        WriterClass.writeClass(className, BytecodeGenerator.closeClass(labelStack));
     }
 
     // return the symbol of next token
@@ -118,26 +118,26 @@ public class Parser {
         if (check(Symbol.SOCKET)) {
             match(Symbol.SOCKET);
             match(Symbol.IDENTIFIER);
-            identifiers.put(line[1], new String[]{DatagramSocket.class.toString(), (++identifierIndex).toString()});
+            identifiers.put(line[1], new String[]{Type.getInternalName(DatagramSocket.class), (++identifierIndex).toString()});
             match(Symbol.EQUALS);
             expression(1);
         } else if (check(Symbol.TYPE_INT)) {
             match(Symbol.TYPE_INT);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
-            identifiers.put(line[1], new String[]{int.class.toString(), (++identifierIndex).toString()});
+            identifiers.put(line[1], new String[]{Type.getInternalName(int.class), (++identifierIndex).toString()});
             expression(2);
         } else if (check(Symbol.TYPE_FLOAT)) {
             match(Symbol.TYPE_FLOAT);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
-            identifiers.put(line[1], new String[]{float.class.toString(), (++identifierIndex).toString()});
+            identifiers.put(line[1], new String[]{Type.getInternalName(float.class), (++identifierIndex).toString()});
             expression(6);
         } else if (check(Symbol.TYPE_STRING)) {
             match(Symbol.TYPE_STRING);
             match(Symbol.IDENTIFIER);
             match(Symbol.EQUALS);
-            identifiers.put(line[1], new String[]{String.class.toString(), (++identifierIndex).toString()});
+            identifiers.put(line[1], new String[]{Type.getInternalName(String.class), (++identifierIndex).toString()});
             expression(8);
         } else if (check(Symbol.INT)) {
             expression(3);
@@ -164,7 +164,22 @@ public class Parser {
         } else if(check(Symbol.LOOP)) {
             match(Symbol.LOOP);
             match(Symbol.L_BRACKET);
-            labelStack.add(BytecodeGenerator.visitLabel());
+            ArrayList<Object> variablesTypes = new ArrayList<>();
+            for (Map.Entry<String, String[]> variable : identifiers.entrySet()) {
+                if (Objects.equals(variable.getValue()[0], "int")) {
+                    variablesTypes.add(Opcodes.INTEGER);
+                } else if (Objects.equals(variable.getValue()[0], "float")) {
+                    variablesTypes.add(Opcodes.FLOAT);
+                } else {
+                    variablesTypes.add(variable.getValue()[0]);
+                }
+            }
+            System.out.println(variablesTypes.size());
+//            Collections.reverse(variablesTypes);
+            System.out.println(Arrays.toString(variablesTypes.toArray()));
+//            System.out.println(Type.getInternalName(int.class));
+//            System.out.println(Opcodes.INTEGER);
+            labelStack.add(BytecodeGenerator.visitLabel(variablesTypes.size(), variablesTypes));
         } else if (check(Symbol.R_BRACKET)) {
             match(Symbol.R_BRACKET);
             BytecodeGenerator.gotoLabel(labelStack.pop());
@@ -196,10 +211,10 @@ public class Parser {
                 if (!check(Symbol.EOL)) {
                     match(Symbol.STRING);
                     sockets.put(line[1], new String[]{line[index - 2], line[index - 1]});
-                    BytecodeGenerator.createClientSocket(Integer.parseInt(line[index - 2]), line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
+                    BytecodeGenerator.createClientSocket(null, line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
                 } else {
                     sockets.put(line[1], new String[]{line[index - 1]});
-                    BytecodeGenerator.createClientSocket(Integer.parseInt(line[index - 1]), null, identifierIndex);
+                    BytecodeGenerator.createClientSocket(null, null, identifierIndex);
                 }
             } else {
                 throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
