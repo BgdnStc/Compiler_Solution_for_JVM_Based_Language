@@ -3,12 +3,15 @@ package org.bgdnstc;
 import org.objectweb.asm.Type;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchMethodException {
         Parser.parse("src/source.bynt");
         Parser.parse("src/UDPServer.bynt");
         Parser.parse("src/UDPClient.bynt");
 
 //        System.out.println(Type.getInternalName(String.class));
+
+
+//        BytecodeGenerator.testServer(8887, "localhost", 1);
 
 //        TODO:
 //        IMPORTANT: fix frame size and test

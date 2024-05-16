@@ -38,7 +38,7 @@ public class Parser {
             line = Tokenizer.tokenize(scanner.nextLine());
             statement();
         }
-        WriterClass.writeClass(className, BytecodeGenerator.closeClass(labelStack));
+        WriterClass.writeClass(className, BytecodeGenerator.closeClass());
     }
 
     // return the symbol of next token
@@ -276,11 +276,11 @@ public class Parser {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
                 match(Symbol.IDENTIFIER);
                 if (identifier != null) {
-                    if (identifier[0].equals(DatagramSocket.class.toString())) {
+                    if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                         if (check(Symbol.DOT)) {
                             match(Symbol.DOT);
                             if (check(Symbol.SEND)) {
-                                if (identifier[0].equals(DatagramSocket.class.toString())) {
+                                if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                     match(Symbol.SEND);
                                     if (check(Symbol.STRING)) {
                                         match(Symbol.STRING);
@@ -293,7 +293,7 @@ public class Parser {
                                     } else if (check(Symbol.IDENTIFIER)) {
                                         match(Symbol.IDENTIFIER);
                                         String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
-                                        if (stringIdentifier != null && stringIdentifier[0].equals(String.class.toString())) {
+                                        if (stringIdentifier != null && stringIdentifier[0].equals(Type.getInternalName(String.class))) {
                                             identifierIndex++;
                                             if (sockets.get(line[index - 4]).length > 1) {
                                                 BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
@@ -312,7 +312,7 @@ public class Parser {
                                     }
                                 }
                             } else if (check(Symbol.RECEIVE)) {
-                                if (identifier[0].equals(DatagramSocket.class.toString())) {
+                                if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                     match(Symbol.RECEIVE);
                                     identifierIndex++;
                                     BytecodeGenerator.receiveUDP(identifierIndex, Integer.parseInt(identifier[1]));
@@ -328,7 +328,7 @@ public class Parser {
                             // TODO
                             match(Symbol.EQUALS);
                         }
-                    } else if (identifier[0].equals(int.class.toString())) {
+                    } else if (identifier[0].equals(Type.getInternalName(int.class))) {
                         if (check(Symbol.EQUALS)) {
                             match(Symbol.EQUALS);
                             match(Symbol.INT);
@@ -337,7 +337,7 @@ public class Parser {
                         } else {
                             throw new PatternSyntaxException("Expected a statement. Received an identifier.", "identifier + symbol", 1);
                         }
-                    } else if (identifier[0].equals(float.class.toString())) {
+                    } else if (identifier[0].equals(Type.getInternalName(float.class))) {
                         if (check(Symbol.EQUALS)) {
                             match(Symbol.EQUALS);
                             match(Symbol.FLOAT);
@@ -346,7 +346,7 @@ public class Parser {
                         } else {
                             throw new PatternSyntaxException("Expected a statement. Received an identifier.", "identifier + symbol", 1);
                         }
-                    } else if (identifier[0].equals(String.class.toString())) {
+                    } else if (identifier[0].equals(Type.getInternalName(String.class))) {
                         if (check(Symbol.EQUALS)) {
                             match(Symbol.EQUALS);
                             match(Symbol.STRING);
@@ -434,10 +434,10 @@ public class Parser {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
                 match(Symbol.IDENTIFIER);
                 if (identifier != null) {
-                    if (identifier[0].equals(DatagramSocket.class.toString())) {
+                    if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                         match(Symbol.DOT);
                         if (check(Symbol.SEND)) {
-                            if (identifier[0].equals(DatagramSocket.class.toString())) {
+                            if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                 match(Symbol.SEND);
                                 if (check(Symbol.STRING)) {
                                     match(Symbol.STRING);
@@ -450,7 +450,7 @@ public class Parser {
                                 } else if (check(Symbol.IDENTIFIER)) {
                                     match(Symbol.IDENTIFIER);
                                     String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
-                                    if (stringIdentifier != null && stringIdentifier[0].equals(String.class.toString())) {
+                                    if (stringIdentifier != null && stringIdentifier[0].equals(Type.getInternalName(String.class))) {
                                         identifierIndex++;
                                         if (sockets.get(line[index - 4]).length > 1) {
                                             BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
@@ -469,7 +469,7 @@ public class Parser {
                                 }
                             }
                         } else if (check(Symbol.RECEIVE)) {
-                            if (identifier[0].equals(DatagramSocket.class.toString())) {
+                            if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                 match(Symbol.RECEIVE);
                                 identifierIndex++;
                                 BytecodeGenerator.receiveUDP(identifierIndex, Integer.parseInt(identifier[1]));
@@ -481,15 +481,15 @@ public class Parser {
                                 }
                             }
                         }
-                    } else if (identifier[0].equals(int.class.toString())) {
+                    } else if (identifier[0].equals(Type.getInternalName(int.class))) {
                         BytecodeGenerator.printGetStatic();
                         BytecodeGenerator.loadInteger(Integer.parseInt(identifier[1]));
                         BytecodeGenerator.printInvokeVirtualInt();
-                    } else if (identifier[0].equals(float.class.toString())) {
+                    } else if (identifier[0].equals(Type.getInternalName(float.class))) {
                         BytecodeGenerator.printGetStatic();
                         BytecodeGenerator.loadFloat(Integer.parseInt(identifier[1]));
                         BytecodeGenerator.printInvokeVirtualFloat();
-                    } else if (identifier[0].equals(String.class.toString())) {
+                    } else if (identifier[0].equals(Type.getInternalName(String.class))) {
                         BytecodeGenerator.printGetStatic();
                         BytecodeGenerator.loadReference(Integer.parseInt(identifier[1]));
                         BytecodeGenerator.printInvokeVirtualString();

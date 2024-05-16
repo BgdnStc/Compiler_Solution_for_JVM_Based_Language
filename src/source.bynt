@@ -1,11 +1,4 @@
-string s1 = "l"
 string s = "h"
-int i = 6
-string j = "j"
-string z = "z"
-string x = "x"
-string v = "v"
-string c = "c"
-loop {
-    print i
-}
+int i = 7
+Socket s1 = UDPServer @ 7776 "localhost"
+s1.send "message"
