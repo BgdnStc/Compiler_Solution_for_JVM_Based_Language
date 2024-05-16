@@ -1,4 +1,9 @@
-string s = "h"
-int i = 7
-Socket s1 = UDPServer @ 7776 "localhost"
-s1.send "message"
+Socket socket1 = UDPServer @ 8880
+int i = 21
+i = 30
+float f = 4.2
+string s = "message from the client"
+loop {
+    print i
+    socket1.send s
+}

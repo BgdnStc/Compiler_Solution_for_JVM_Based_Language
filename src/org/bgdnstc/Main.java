@@ -8,14 +8,10 @@ public class Main {
         Parser.parse("src/UDPServer.bynt");
         Parser.parse("src/UDPClient.bynt");
 
-//        System.out.println(Type.getInternalName(String.class));
-
-
-//        BytecodeGenerator.testServer(8887, "localhost", 1);
-
 //        TODO:
 //        IMPORTANT: fix frame size and test
-//        test frame creation + objects order in locals stack
+//        (Frame stack might be solved) test frame creation + objects order in locals stack
+//        ordered hashmap has been added (needs testing)
 //        test file path format (/ or \\) and its destination
 //        while loops
 //        (maybe fixed ?) fix case in which integer variables are saved as objects

@@ -22,6 +22,8 @@ public class Parser {
     private static final HashMap<String, String[]> sockets = new HashMap<>();
     // stack of labels, last label is the current loop
     private static final Stack<Label> labelStack = new Stack<>();
+    // knows if any frames have been created for the loop structure
+    private static boolean multipleFrames = false;
 
     // private constructor for preventing instantiation
     private Parser() {
@@ -38,7 +40,7 @@ public class Parser {
             line = Tokenizer.tokenize(scanner.nextLine());
             statement();
         }
-        WriterClass.writeClass(className, BytecodeGenerator.closeClass());
+        WriterClass.writeClass(className, BytecodeGenerator.closeClass(multipleFrames));
     }
 
     // return the symbol of next token
@@ -179,6 +181,7 @@ public class Parser {
             System.out.println(Arrays.toString(variablesTypes.toArray()));
 //            System.out.println(Type.getInternalName(int.class));
 //            System.out.println(Opcodes.INTEGER);
+            multipleFrames = true;
             labelStack.add(BytecodeGenerator.visitLabel(variablesTypes.size(), variablesTypes));
         } else if (check(Symbol.R_BRACKET)) {
             match(Symbol.R_BRACKET);
@@ -437,37 +440,38 @@ public class Parser {
                     if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                         match(Symbol.DOT);
                         if (check(Symbol.SEND)) {
-                            if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
-                                match(Symbol.SEND);
-                                if (check(Symbol.STRING)) {
-                                    match(Symbol.STRING);
-                                    identifierIndex++;
-                                    if (sockets.get(line[index - 4]).length > 1) {
-                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, line[index - 4].length() - 1));
-                                    } else {
-                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
-                                    }
-                                } else if (check(Symbol.IDENTIFIER)) {
-                                    match(Symbol.IDENTIFIER);
-                                    String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
-                                    if (stringIdentifier != null && stringIdentifier[0].equals(Type.getInternalName(String.class))) {
-                                        identifierIndex++;
-                                        if (sockets.get(line[index - 4]).length > 1) {
-                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
-                                        } else {
-                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
-                                        }
-                                    } else {
-                                        throw new IllegalArgumentException("Expected string / string identifier after 'send' method");
-                                    }
-                                }
-                            } else {
-                                try {
-                                    throw new NoSuchMethodException("UDP Client does not have such a method.");
-                                } catch (NoSuchMethodException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
+                            throw new UnsupportedOperationException("Illegal statement. Print cannot be called on Socket's \"send\" method.");
+//                            if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
+//                                match(Symbol.SEND);
+//                                if (check(Symbol.STRING)) {
+//                                    match(Symbol.STRING);
+//                                    identifierIndex++;
+//                                    if (sockets.get(line[index - 4]).length > 1) {
+//                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, line[index - 4].length() - 1));
+//                                    } else {
+//                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
+//                                    }
+//                                } else if (check(Symbol.IDENTIFIER)) {
+//                                    match(Symbol.IDENTIFIER);
+//                                    String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
+//                                    if (stringIdentifier != null && stringIdentifier[0].equals(Type.getInternalName(String.class))) {
+//                                        identifierIndex++;
+//                                        if (sockets.get(line[index - 4]).length > 1) {
+//                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
+//                                        } else {
+//                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
+//                                        }
+//                                    } else {
+//                                        throw new IllegalArgumentException("Expected string / string identifier after 'send' method");
+//                                    }
+//                                }
+//                            } else {
+//                                try {
+//                                    throw new NoSuchMethodException("UDP Client does not have such a method.");
+//                                } catch (NoSuchMethodException e) {
+//                                    throw new RuntimeException(e);
+//                                }
+//                            }
                         } else if (check(Symbol.RECEIVE)) {
                             if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                 match(Symbol.RECEIVE);
