@@ -1,2 +1,4 @@
-Socket clientSocket = UDPClient @ 7777
-clientSocket.send "message from client"
+Socket clientSocket = UDPClient @ 7776
+loop {
+    clientSocket.send "message 1 from client"
+}

@@ -1,2 +1,4 @@
-Socket socket1 = UDPServer @ 7777
-print socket1.receive
+Socket socket1 = UDPServer @ 7776
+loop {
+    print socket1.receive
+}

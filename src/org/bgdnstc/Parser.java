@@ -17,11 +17,11 @@ public class Parser {
     // current available index for variables
     private static Integer identifierIndex = 0;
     // [ identifier, {class, identifier index} ]
-    private static final LinkedHashMap<String, String[]> identifiers = new LinkedHashMap<>();
+    private static LinkedHashMap<String, String[]> identifiers = new LinkedHashMap<>();
     // [ identifier, {port, address} ]
-    private static final HashMap<String, String[]> sockets = new HashMap<>();
+    private static HashMap<String, String[]> sockets = new HashMap<>();
     // stack of labels, last label is the current loop
-    private static final Stack<Label> labelStack = new Stack<>();
+    private static Stack<Label> labelStack = new Stack<>();
     // knows if any frames have been created for the loop structure
     private static boolean multipleFrames = false;
 
@@ -32,6 +32,10 @@ public class Parser {
     // parse method dictates the execution flow of the compiler
     public static void parse(String path) {
         identifierIndex = 0;
+        identifiers = new LinkedHashMap<>();
+        sockets = new HashMap<>();
+        labelStack = new Stack<>();
+        multipleFrames = false;
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
         final String className = WriterClass.pathToClassName(path);
         BytecodeGenerator.createClass(className);

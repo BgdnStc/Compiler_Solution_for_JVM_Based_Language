@@ -5,11 +5,15 @@ public class Main {
         Parser.parse("src/source.bynt");
         Parser.parse("src/source2.bynt");
 
-
-        Parser.parse("src/UDPServer.bynt");
-        Parser.parse("src/UDPClient.bynt");
+//        Parser.parse("src/UDPServer.bynt");
+//        Parser.parse("src/UDPClient.bynt");
 
 //        TODO:
+//        incrementation
+//        if
+
+//        sequential compiling
+
 //        IMPORTANT: fix frame size and test
 //        (Frame stack might be solved) test frame creation + objects order in locals stack
 //        ordered hashmap has been added (needs testing)
@@ -19,6 +23,7 @@ public class Main {
 //        (maybe fixed ?) fix case in which integer variables are saved as objects
 
 //        Parser.parse(args[0]);
+
 //        for (String path : args) {
 //            Parser.parse(path);
 //        }
