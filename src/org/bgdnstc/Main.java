@@ -1,10 +1,11 @@
 package org.bgdnstc;
 
-import org.objectweb.asm.Type;
-
 public class Main {
     public static void main(String[] args) throws NoSuchMethodException {
         Parser.parse("src/source.bynt");
+        Parser.parse("src/source2.bynt");
+
+
         Parser.parse("src/UDPServer.bynt");
         Parser.parse("src/UDPClient.bynt");
 

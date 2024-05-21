@@ -1,9 +1,2 @@
-Socket socket1 = UDPServer @ 8880
-int i = 21
-i = 30
-float f = 4.2
-string s = "message from the client"
-loop {
-    print i
-    socket1.send s
-}
+Socket socket1 = UDPServer @ 7777
+print socket1.receive
