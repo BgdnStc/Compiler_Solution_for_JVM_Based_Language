@@ -9,7 +9,7 @@ public class Main {
 //        Parser.parse("src/UDPClient.bynt");
 
 //        TODO:
-//        incrementation for integers
+//        integer incrementation
 //        if structure
 
 //        sequential compiling
