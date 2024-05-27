@@ -2,15 +2,15 @@ package org.bgdnstc;
 
 public class Main {
     public static void main(String[] args) throws NoSuchMethodException {
-        Parser.parse("src/source.bynt");
-        Parser.parse("src/source2.bynt");
+        Parser.parse(".\\source.bynt");
+//        Parser.parse("src\\source2.bynt");
 
 //        Parser.parse("src/UDPServer.bynt");
 //        Parser.parse("src/UDPClient.bynt");
 
 //        TODO:
-//        integer incrementation
-//        if structure
+//        integer incrementation operation
+//        if structure inside loops
 
 //        sequential compiling
 
