@@ -8,7 +8,7 @@ public class Main {
 //        Parser.parse("src/UDPServer.bynt");
 //        Parser.parse("src/UDPClient.bynt");
 
-//        Parser.parse("C:\\Users\\Bogdan\\Downloads\\hClass.bynt");
+//        Parser.parse("C:\\Users\\Bogdan\\IdeaProjects\\Compiler_Solution_for_JVM_Based_Language\\src\\test.bynt");
 
 //        TODO:
 //        integer incrementation operation

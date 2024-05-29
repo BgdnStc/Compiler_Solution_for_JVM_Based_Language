@@ -42,7 +42,9 @@ public class Parser {
         while (scanner.hasNextLine()) {
             index = 0;
             line = Tokenizer.tokenize(scanner.nextLine());
-            statement();
+            if (!Objects.equals(line[0], "\n") || !line[0].isEmpty()) {
+                statement();
+            }
         }
         WriterClass.writeClass(className, BytecodeGenerator.closeClass(multipleFrames));
     }
@@ -51,7 +53,7 @@ public class Parser {
     private static Symbol nextSymbol() {
         String token;
         if (index < line.length) {
-            token = line[index];
+            token = line[index].trim();
         } else {
             token = null;
         }
