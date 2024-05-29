@@ -69,6 +69,8 @@ public class Parser {
                     return Symbol.MUL;
                 case "DIV":
                     return Symbol.DIV;
+                case "INC":
+                    return Symbol.INC;
                 case "loop":
                     return Symbol.LOOP;
                 case "while":
@@ -343,6 +345,10 @@ public class Parser {
                             match(Symbol.INT);
                             BytecodeGenerator.pushShort(Integer.parseInt(line[index - 1]));
                             BytecodeGenerator.storeInt(Integer.parseInt(identifier[1]));
+                        } else if (check(Symbol.INT)) {
+                            match(Symbol.INT);
+                            match(Symbol.INC);
+                            BytecodeGenerator.incrementIntegers(Integer.parseInt(identifier[1]), Integer.parseInt(line[index - 2]));
                         } else {
                             throw new PatternSyntaxException("Expected a statement. Received an identifier.", "identifier + symbol", 1);
                         }

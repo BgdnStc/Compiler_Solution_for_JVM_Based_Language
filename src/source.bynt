@@ -1,4 +1,7 @@
-Socket socket1 = UDPServer @ 7776
+Socket serverSocket = UDPServer @ 7777 "localhost"
+int i = 0
 loop {
-    print socket1.receive
+    i 1 INC
+    print i
+    print serverSocket.receive
 }

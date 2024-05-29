@@ -6,7 +6,7 @@ public enum Symbol {
     // values
     INT, FLOAT, STRING,
     // operators
-    EQUALS, ADD, SUB, MUL, DIV, LOOP, WHILE, PRINT,
+    EQUALS, ADD, SUB, MUL, DIV, INC, LOOP, WHILE, PRINT,
     // methods
     RECEIVE, SEND,
     // punctuation marks

@@ -78,6 +78,13 @@ public class BytecodeGenerator {
         mv.visitInsn(IDIV);
     }
 
+    static void incrementIntegers(int firstOperandIdentifierIndex, int secondOperand) {
+        mv.visitVarInsn(ILOAD, firstOperandIdentifierIndex);
+        pushConstantLdc(secondOperand);
+        mv.visitInsn(IADD);
+        storeInt(firstOperandIdentifierIndex);
+    }
+
     static void addFloats(float firstOperand, float secondOperand) {
         mv.visitLdcInsn(firstOperand);
         mv.visitLdcInsn(secondOperand);
