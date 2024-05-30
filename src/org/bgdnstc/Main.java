@@ -11,7 +11,7 @@ public class Main {
 //        Parser.parse("C:\\Users\\Bogdan\\IdeaProjects\\Compiler_Solution_for_JVM_Based_Language\\src\\test.bynt");
 
 //TODO:
-//        integer incrementation operation
+//        integer incrementation operation (done, needs testing)
 //        if structure inside loops
 
 //        sequential compiling
