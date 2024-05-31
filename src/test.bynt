@@ -1,4 +1,0 @@
-Socket serverSocket = UDPServer @ 8789
-loop {
-	print serverSocket.receive
-}

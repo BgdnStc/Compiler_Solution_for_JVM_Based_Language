@@ -22,7 +22,6 @@ public class Main {
 //        IMPORTANT: fix frame size and test
 //        (Frame stack might be solved) test frame creation + objects order in locals stack
 //        ordered hashmap has been added (needs testing)
-//        test code
 //        test file path format (/ or \\) and its destination
 //        while loops
 //        (maybe fixed ?) fix case in which integer variables are saved as objects
