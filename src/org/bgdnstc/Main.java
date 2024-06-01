@@ -13,7 +13,6 @@ public class Main {
 //TODO:
 //        integer incrementation operation (done, needs testing)
 //        if structure inside loops
-
 //        sequential compiling
 
 //TODO

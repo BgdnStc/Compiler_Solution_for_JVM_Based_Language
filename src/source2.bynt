@@ -1,4 +1,8 @@
 Socket clientSocket = UDPClient @ 7777
+int i = 0
 loop {
     clientSocket.send "message from client"
+    i 1 INC
+    when i == 5
+        exit
 }
