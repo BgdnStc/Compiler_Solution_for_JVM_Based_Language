@@ -24,6 +24,7 @@ public class Parser {
     private static Stack<Label> labelStack = new Stack<>();
     // knows if any frames have been created for the loop structure
     private static boolean multipleFrames = false;
+    private static boolean loopOpen = false;
 
     // private constructor for preventing instantiation
     private Parser() {
@@ -73,8 +74,18 @@ public class Parser {
                     return Symbol.INC;
                 case "loop":
                     return Symbol.LOOP;
+                case "when":
+                    return Symbol.WHEN;
+                case "break":
+                    return Symbol.BREAK;
                 case "while":
                     return Symbol.WHILE;
+                case "==":
+                    return Symbol.LOGIC_EQUALS;
+                case ">":
+                    return Symbol.GREATER;
+                case "<":
+                    return Symbol.LESS;
                 case "int":
                     return Symbol.TYPE_INT;
                 case "float":
@@ -194,6 +205,11 @@ public class Parser {
         } else if (check(Symbol.R_BRACKET)) {
             match(Symbol.R_BRACKET);
             BytecodeGenerator.gotoLabel(labelStack.pop());
+        } else if(check(Symbol.WHEN)) {
+            if (!loopOpen) {
+                throw new IllegalArgumentException("Unexpected token received. Token \"when\" can be used inside loop structures only");
+            }
+            expression(11);
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
         }
@@ -514,6 +530,12 @@ public class Parser {
                     throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
                 }
             }
+        } else if (expressionPath == 11) {
+//           TODO
+//            match(Symbol.INT);
+//            match(Symbol.GREATER);
+//            match(Symbol.INT);
+//            match(Symbol.BREAK);
         } else {
             throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
         }

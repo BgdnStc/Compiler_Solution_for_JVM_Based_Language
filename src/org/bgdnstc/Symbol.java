@@ -6,9 +6,11 @@ public enum Symbol {
     // values
     INT, FLOAT, STRING,
     // operators
-    EQUALS, ADD, SUB, MUL, DIV, INC, LOOP, WHILE, PRINT,
+    EQUALS, ADD, SUB, MUL, DIV, INC, LOOP, WHEN, BREAK, WHILE,
+    // logic operators
+    GREATER, LESS, LOGIC_EQUALS,
     // methods
-    RECEIVE, SEND,
+    PRINT, RECEIVE, SEND,
     // punctuation marks
     DOT, L_BRACKET, R_BRACKET, L_PARENTHESIS, R_PARENTHESIS, AT,
     // identifier (variable name)
