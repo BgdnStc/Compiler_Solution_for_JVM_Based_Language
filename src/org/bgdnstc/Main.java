@@ -13,7 +13,8 @@ public class Main {
 //        Parser.parse("C:\\Users\\Bogdan\\IdeaProjects\\Compiler_Solution_for_JVM_Based_Language\\src\\test.bynt");
 
 //TODO:
-//        expression path 11
+//        code clean up
+//        expression path 11 (done, needs testing - statements after the loop)
 //        integer incrementation operation (done, needs testing)
 //        if structure inside loops
 //        sequential compiling
