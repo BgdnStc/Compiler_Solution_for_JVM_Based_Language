@@ -3,5 +3,5 @@ int i = 0
 loop {
     clientSocket.send "message from client"
     i 1 INC
-    if i == 5 exit
+    when i == 5 exit
 }

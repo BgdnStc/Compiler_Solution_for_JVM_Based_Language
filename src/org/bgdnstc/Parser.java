@@ -24,8 +24,12 @@ public class Parser {
     private static Stack<Label> labelStack = new Stack<>();
     // knows if any frames have been created for the loop structure
     private static boolean multipleFrames = false;
-    private static boolean loopOpen = false;
 
+    //
+    private static boolean loopOpen = false;
+    static Label labelWhen = new Label();
+    static Label labelExit = new Label();
+    static ArrayList<Object> variablesTypesX = new ArrayList<>();
     // private constructor for preventing instantiation
     private Parser() {
     }
@@ -37,6 +41,9 @@ public class Parser {
         sockets = new HashMap<>();
         labelStack = new Stack<>();
         multipleFrames = false;
+        loopOpen = false;
+        labelWhen = new Label();
+        labelExit = new Label();
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
         final String className = WriterClass.pathToClassName(path);
         BytecodeGenerator.createClass(className);
@@ -76,8 +83,8 @@ public class Parser {
                     return Symbol.LOOP;
                 case "when":
                     return Symbol.WHEN;
-                case "break":
-                    return Symbol.BREAK;
+                case "exit":
+                    return Symbol.EXIT;
                 case "while":
                     return Symbol.WHILE;
                 case "==":
@@ -185,6 +192,7 @@ public class Parser {
         } else if(check(Symbol.LOOP)) {
             match(Symbol.LOOP);
             match(Symbol.L_BRACKET);
+            loopOpen = true;
             ArrayList<Object> variablesTypes = new ArrayList<>();
             for (Map.Entry<String, String[]> variable : identifiers.entrySet()) {
                 if (Objects.equals(variable.getValue()[0], "int")) {
@@ -195,6 +203,7 @@ public class Parser {
                     variablesTypes.add(variable.getValue()[0]);
                 }
             }
+            variablesTypesX = variablesTypes;
             System.out.println(variablesTypes.size());
 //            Collections.reverse(variablesTypes);
             System.out.println(Arrays.toString(variablesTypes.toArray()));
@@ -204,11 +213,15 @@ public class Parser {
             labelStack.add(BytecodeGenerator.visitLabel(variablesTypes.size(), variablesTypes));
         } else if (check(Symbol.R_BRACKET)) {
             match(Symbol.R_BRACKET);
+            loopOpen = false;
             BytecodeGenerator.gotoLabel(labelStack.pop());
+            BytecodeGenerator.visitLabel2(labelExit);
+            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
         } else if(check(Symbol.WHEN)) {
             if (!loopOpen) {
                 throw new IllegalArgumentException("Unexpected token received. Token \"when\" can be used inside loop structures only");
             }
+            match(Symbol.WHEN);
             expression(11);
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
@@ -388,7 +401,7 @@ public class Parser {
                         }
                     }
                 } else {
-                    throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
+                    throw new IllegalArgumentException("Provided identifier does not exist or it has not been declared.");
                 }
             }
         } else if(expressionPath == 5) {
@@ -527,15 +540,70 @@ public class Parser {
                         BytecodeGenerator.printInvokeVirtualString();
                     }
                 } else {
-                    throw new RuntimeException("Provided identifier does not exist or it has not been declared.");
+                    throw new IllegalArgumentException("Provided identifier does not exist or it has not been declared.");
                 }
             }
         } else if (expressionPath == 11) {
-//           TODO
-//            match(Symbol.INT);
-//            match(Symbol.GREATER);
-//            match(Symbol.INT);
-//            match(Symbol.BREAK);
+            if (check(Symbol.INT)) {
+                match(Symbol.INT);
+                if (check(Symbol.GREATER)) {
+                    match(Symbol.GREATER);
+                    match(Symbol.INT);
+                    match(Symbol.EXIT);
+                } else if (check(Symbol.LESS)) {
+                    match(Symbol.LESS);
+                    match(Symbol.INT);
+                    match(Symbol.EXIT);
+                } else if (check(Symbol.LOGIC_EQUALS)) {
+                    match(Symbol.LOGIC_EQUALS);
+                    match(Symbol.INT);
+                    match(Symbol.EXIT);
+                } else {
+                    throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison symbol, received: " + line[index]);
+                }
+            } else if (check(Symbol.IDENTIFIER)) {
+                String[] identifier = identifiers.getOrDefault(line[index], null);
+                match(Symbol.IDENTIFIER);
+                if (identifier != null) {
+                    BytecodeGenerator.loadInteger(Integer.parseInt(identifier[1]));
+                    if (identifier[0].equals(Type.getInternalName(int.class))) {
+                        if (check(Symbol.GREATER)) {
+                            match(Symbol.GREATER);
+                            match(Symbol.INT);
+                            BytecodeGenerator.pushConstantLdc(line[index - 1]);
+                            match(Symbol.EXIT);
+                        } else if (check(Symbol.LESS)) {
+                            match(Symbol.LESS);
+                            match(Symbol.INT);
+                            BytecodeGenerator.pushConstantLdc(line[index - 1]);
+                            Label labelIF = new Label();
+                            Label labelExit = new Label();
+                            BytecodeGenerator.logicEquals(labelIF, labelExit);
+                            match(Symbol.EXIT);
+                        } else if (check(Symbol.LOGIC_EQUALS)) {
+                            match(Symbol.LOGIC_EQUALS);
+                            match(Symbol.INT);
+                            BytecodeGenerator.pushConstantLdc(Integer.parseInt(line[index - 1]));
+
+
+                            BytecodeGenerator.logicEquals(labelWhen, labelExit);
+                            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+//                            BytecodeGenerator.visitLabel2(labelWhen);
+                            match(Symbol.EXIT);
+//                            BytecodeGenerator.visitLabel2(labelExit);
+                            multipleFrames = false;
+                        } else {
+                            throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison symbol, received: " + line[index]);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Unexpected identifier. Provided variable is not an integer.");
+                    }
+                } else {
+                    throw new IllegalArgumentException("Provided identifier does not exist or it has not been declared.");
+                }
+            } else {
+                throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
+            }
         } else {
             throw new IllegalArgumentException("Unexpected tokens. Invalid expression.");
         }

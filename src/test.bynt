@@ -1,0 +1,6 @@
+int i = 0
+loop {
+    when i == 10 exit
+    print "banana"
+    i 1 INC
+}

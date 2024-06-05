@@ -6,7 +6,7 @@ public enum Symbol {
     // values
     INT, FLOAT, STRING,
     // operators
-    EQUALS, ADD, SUB, MUL, DIV, INC, LOOP, WHEN, BREAK, WHILE,
+    EQUALS, ADD, SUB, MUL, DIV, INC, LOOP, WHEN, EXIT, WHILE,
     // logic operators
     GREATER, LESS, LOGIC_EQUALS,
     // methods
