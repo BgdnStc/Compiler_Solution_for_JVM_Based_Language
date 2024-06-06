@@ -29,12 +29,12 @@ public class Main {
 //        while loops
 //        (maybe fixed ?) fix case in which integer variables are saved as objects
 
-        System.out.println(args[0]);
-        Parser.parse(args[0]);
+//        System.out.println(args[0]);
+//        Parser.parse(args[0]);
 
-//        for (String path : args) {
-//            System.out.println(path);
-//            Parser.parse(path);
-//        }
+        for (String path : args) {
+            System.out.println(path);
+            Parser.parse(path);
+        }
     }
 }
