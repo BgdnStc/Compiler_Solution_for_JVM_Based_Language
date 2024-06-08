@@ -18,6 +18,7 @@ public class Main {
 //        integer incrementation operation (done, needs testing)
 //        if structure inside loops
 //        sequential compiling
+//        testing graphical interface communication
 
 //TODO
 //        writer class destination directory
