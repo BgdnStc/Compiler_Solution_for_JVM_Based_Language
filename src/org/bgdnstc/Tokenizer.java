@@ -80,6 +80,7 @@ public class Tokenizer {
             tokens.add(token.toString());
         }
         String[] tokensArray = new String[tokens.size()];
+        tokens.replaceAll(String::trim);
         tokens.toArray(tokensArray);
         return tokensArray;
     }

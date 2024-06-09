@@ -1,6 +1,7 @@
 int i = 0
+string s = "i like monkeys"
 loop {
-    when i == 10 exit
-    i 1 INC
-    print "banana"
+	when i == 5 exit
+	i 1 INC
+	print s
 }

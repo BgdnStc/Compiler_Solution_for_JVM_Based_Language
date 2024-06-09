@@ -27,6 +27,7 @@ public class Parser {
 
     //
     private static boolean loopOpen = false;
+    private static boolean exitCondition = false;
     static Label labelWhen = new Label();
     static Label labelExit = new Label();
     static ArrayList<Object> variablesTypesX = new ArrayList<>();
@@ -42,6 +43,7 @@ public class Parser {
         labelStack = new Stack<>();
         multipleFrames = false;
         loopOpen = false;
+        exitCondition = false;
         labelWhen = new Label();
         labelExit = new Label();
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
@@ -216,13 +218,16 @@ public class Parser {
             loopOpen = false;
             BytecodeGenerator.gotoLabel(labelStack.pop());
             BytecodeGenerator.visitLabel2(labelExit);
-            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+            if (exitCondition) {
+                BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+            }
         } else if(check(Symbol.WHEN)) {
             if (!loopOpen) {
                 throw new IllegalArgumentException("Unexpected token received. Token \"when\" can be used inside loop structures only");
             }
             match(Symbol.WHEN);
             expression(11);
+            exitCondition = true;
         } else {
             throw new IllegalArgumentException("Unexpected token received. This is not a statement.");
         }
