@@ -16,7 +16,7 @@ public class Main {
 //        code clean up
 //        expression path 11 (done, needs testing - statements after the loop)
 //        integer incrementation operation (done, needs testing)
-//        if structure inside loops
+//        when structure inside loops
 //        sequential compiling
 //        testing graphical interface communication
 
