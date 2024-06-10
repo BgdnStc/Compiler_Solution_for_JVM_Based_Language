@@ -206,9 +206,13 @@ public class Parser {
                 }
             }
             variablesTypesX = variablesTypes;
-            System.out.println(variablesTypes.size());
+//           TODO
+//            System.out.println(variablesTypes.size());
+
 //            Collections.reverse(variablesTypes);
-            System.out.println(Arrays.toString(variablesTypes.toArray()));
+//           TODO
+//            System.out.println(Arrays.toString(variablesTypes.toArray()));
+
 //            System.out.println(Type.getInternalName(int.class));
 //            System.out.println(Opcodes.INTEGER);
             multipleFrames = true;
