@@ -491,6 +491,8 @@ public class Parser {
                         match(Symbol.DOT);
                         if (check(Symbol.SEND)) {
                             throw new UnsupportedOperationException("Illegal statement. Print cannot be called on Socket's \"send\" method.");
+
+//                           TODO
 //                            if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
 //                                match(Symbol.SEND);
 //                                if (check(Symbol.STRING)) {
@@ -522,6 +524,7 @@ public class Parser {
 //                                    throw new RuntimeException(e);
 //                                }
 //                            }
+
                         } else if (check(Symbol.RECEIVE)) {
                             if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                 match(Symbol.RECEIVE);

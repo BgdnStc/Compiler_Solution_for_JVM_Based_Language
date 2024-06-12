@@ -10,8 +10,6 @@ public class Main {
 //        Parser.parse("src/UDPServer.bynt");
 //        Parser.parse("src/UDPClient.bynt");
 
-//        Parser.parse("C:\\Users\\Bogdan\\IdeaProjects\\Compiler_Solution_for_JVM_Based_Language\\src\\test.bynt");
-
 //TODO:
 //        code clean up
 //        expression path 11 (done, needs testing - statements after the loop)
