@@ -571,7 +571,7 @@ public class Parser {
                     match(Symbol.INT);
                     match(Symbol.EXIT);
                 } else {
-                    throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison symbol, received: " + line[index]);
+                    throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison operator, received: " + line[index]);
                 }
             } else if (check(Symbol.IDENTIFIER)) {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
@@ -582,16 +582,19 @@ public class Parser {
                         if (check(Symbol.GREATER)) {
                             match(Symbol.GREATER);
                             match(Symbol.INT);
-                            BytecodeGenerator.pushConstantLdc(line[index - 1]);
+                            BytecodeGenerator.pushConstantLdc(Integer.parseInt(line[index - 1]));
+                            BytecodeGenerator.logicGreater(labelWhen, labelExit);
+                            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
                             match(Symbol.EXIT);
+                            multipleFrames = false;
                         } else if (check(Symbol.LESS)) {
                             match(Symbol.LESS);
                             match(Symbol.INT);
-                            BytecodeGenerator.pushConstantLdc(line[index - 1]);
-                            Label labelIF = new Label();
-                            Label labelExit = new Label();
-                            BytecodeGenerator.logicEquals(labelIF, labelExit);
+                            BytecodeGenerator.pushConstantLdc(Integer.parseInt(line[index - 1]));
+                            BytecodeGenerator.logicLess(labelWhen, labelExit);
+                            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
                             match(Symbol.EXIT);
+                            multipleFrames = false;
                         } else if (check(Symbol.LOGIC_EQUALS)) {
                             match(Symbol.LOGIC_EQUALS);
                             match(Symbol.INT);
@@ -605,7 +608,7 @@ public class Parser {
 //                            BytecodeGenerator.visitLabel2(labelExit);
                             multipleFrames = false;
                         } else {
-                            throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison symbol, received: " + line[index]);
+                            throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison operator, received: " + line[index]);
                         }
                     } else {
                         throw new IllegalArgumentException("Unexpected identifier. Provided variable is not an integer.");

@@ -288,14 +288,22 @@ public class BytecodeGenerator {
         mv.visitLabel(label);
     }
 
-    static void logicEquals(Label labelWhen, Label labelExit) {
-        mv.visitJumpInsn(IF_ICMPNE, labelWhen);
+    static void logicGreater(Label labelWhen, Label labelExit) {
+        mv.visitJumpInsn(IF_ICMPGT, labelWhen);
         mv.visitJumpInsn(GOTO, labelExit);
         mv.visitLabel(labelWhen);
     }
 
-    static void ifStructure() {
+    static void logicLess(Label labelWhen, Label labelExit) {
+        mv.visitJumpInsn(IF_ICMPLT, labelWhen);
+        mv.visitJumpInsn(GOTO, labelExit);
+        mv.visitLabel(labelWhen);
+    }
 
+    static void logicEquals(Label labelWhen, Label labelExit) {
+        mv.visitJumpInsn(IF_ICMPNE, labelWhen);
+        mv.visitJumpInsn(GOTO, labelExit);
+        mv.visitLabel(labelWhen);
     }
 
     static void gotoLabel(Label label) {
