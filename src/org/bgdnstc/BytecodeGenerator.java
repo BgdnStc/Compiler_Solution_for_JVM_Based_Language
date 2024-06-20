@@ -280,12 +280,12 @@ public class BytecodeGenerator {
         return label;
     }
 
-    static void visitFrame(int localFrameSize, ArrayList<Object> locals) {
-        mv.visitFrame(F_SAME, localFrameSize, locals.toArray(), 0, null);
-    }
-
     static void visitLabel2(Label label) {
         mv.visitLabel(label);
+    }
+
+    static void visitFrame(int localFrameSize, ArrayList<Object> locals) {
+        mv.visitFrame(F_SAME, localFrameSize, locals.toArray(), 0, null);
     }
 
     static void logicGreater(Label labelWhen, Label labelExit) {

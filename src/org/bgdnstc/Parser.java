@@ -22,15 +22,20 @@ public class Parser {
     private static HashMap<String, String[]> sockets = new HashMap<>();
     // stack of labels, last label is the current loop
     private static Stack<Label> labelStack = new Stack<>();
-    // knows if any frames have been created for the loop structure
-    private static boolean multipleFrames = false;
-
-    //
-    private static boolean loopOpen = false;
-    private static boolean exitCondition = false;
+    // global array for keeping track of the declared variables type
+    static ArrayList<Object> variablesTypes = new ArrayList<>();
+    // label for the loop structure
     static Label labelWhen = new Label();
+    // label for end of the loop
     static Label labelExit = new Label();
-    static ArrayList<Object> variablesTypesX = new ArrayList<>();
+
+    // boolean for frames, knows if any frames have been created for the loop structure
+    private static boolean multipleFrames = false;
+    // boolean for checking if the parser is currently inside a loop
+    private static boolean loopOpen = false;
+    // boolean for checking if the loop has an exist condition
+    private static boolean exitCondition = false;
+
     // private constructor for preventing instantiation
     private Parser() {
     }
@@ -41,11 +46,12 @@ public class Parser {
         identifiers = new LinkedHashMap<>();
         sockets = new HashMap<>();
         labelStack = new Stack<>();
+        variablesTypes = new ArrayList<>();
+        labelWhen = new Label();
+        labelExit = new Label();
         multipleFrames = false;
         loopOpen = false;
         exitCondition = false;
-        labelWhen = new Label();
-        labelExit = new Label();
         final Scanner scanner = new Scanner(SourceReader.readSource(Path.of(path)));
         final String className = WriterClass.pathToClassName(path);
         BytecodeGenerator.createClass(className);
@@ -195,35 +201,35 @@ public class Parser {
             match(Symbol.LOOP);
             match(Symbol.L_BRACKET);
             loopOpen = true;
-            ArrayList<Object> variablesTypes = new ArrayList<>();
+            ArrayList<Object> variablesTypesLocal = new ArrayList<>();
             for (Map.Entry<String, String[]> variable : identifiers.entrySet()) {
                 if (Objects.equals(variable.getValue()[0], "int")) {
-                    variablesTypes.add(Opcodes.INTEGER);
+                    variablesTypesLocal.add(Opcodes.INTEGER);
                 } else if (Objects.equals(variable.getValue()[0], "float")) {
-                    variablesTypes.add(Opcodes.FLOAT);
+                    variablesTypesLocal.add(Opcodes.FLOAT);
                 } else {
-                    variablesTypes.add(variable.getValue()[0]);
+                    variablesTypesLocal.add(variable.getValue()[0]);
                 }
             }
-            variablesTypesX = variablesTypes;
+            variablesTypes = variablesTypesLocal;
 //           TODO
-//            System.out.println(variablesTypes.size());
+//            System.out.println(variablesTypesLocal.size());
 
-//            Collections.reverse(variablesTypes);
+//            Collections.reverse(variablesTypesLocal);
 //           TODO
-//            System.out.println(Arrays.toString(variablesTypes.toArray()));
+//            System.out.println(Arrays.toString(variablesTypesLocal.toArray()));
 
 //            System.out.println(Type.getInternalName(int.class));
 //            System.out.println(Opcodes.INTEGER);
             multipleFrames = true;
-            labelStack.add(BytecodeGenerator.visitLabel(variablesTypes.size(), variablesTypes));
+            labelStack.add(BytecodeGenerator.visitLabel(variablesTypesLocal.size(), variablesTypesLocal));
         } else if (check(Symbol.R_BRACKET)) {
             match(Symbol.R_BRACKET);
             loopOpen = false;
             BytecodeGenerator.gotoLabel(labelStack.pop());
             BytecodeGenerator.visitLabel2(labelExit);
             if (exitCondition) {
-                BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+                BytecodeGenerator.visitFrame(variablesTypes.size(), variablesTypes);
             }
         } else if(check(Symbol.WHEN)) {
             if (!loopOpen) {
@@ -584,7 +590,7 @@ public class Parser {
                             match(Symbol.INT);
                             BytecodeGenerator.pushConstantLdc(Integer.parseInt(line[index - 1]));
                             BytecodeGenerator.logicGreater(labelWhen, labelExit);
-                            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+                            BytecodeGenerator.visitFrame(variablesTypes.size(), variablesTypes);
                             match(Symbol.EXIT);
                             multipleFrames = false;
                         } else if (check(Symbol.LESS)) {
@@ -592,7 +598,7 @@ public class Parser {
                             match(Symbol.INT);
                             BytecodeGenerator.pushConstantLdc(Integer.parseInt(line[index - 1]));
                             BytecodeGenerator.logicLess(labelWhen, labelExit);
-                            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+                            BytecodeGenerator.visitFrame(variablesTypes.size(), variablesTypes);
                             match(Symbol.EXIT);
                             multipleFrames = false;
                         } else if (check(Symbol.LOGIC_EQUALS)) {
@@ -602,7 +608,7 @@ public class Parser {
 
 
                             BytecodeGenerator.logicEquals(labelWhen, labelExit);
-                            BytecodeGenerator.visitFrame(variablesTypesX.size(), variablesTypesX);
+                            BytecodeGenerator.visitFrame(variablesTypes.size(), variablesTypes);
 //                            BytecodeGenerator.visitLabel2(labelWhen);
                             match(Symbol.EXIT);
 //                            BytecodeGenerator.visitLabel2(labelExit);
