@@ -1,5 +1,5 @@
 int i = 0
-string s = "i like monkeys"
+string s = "message"
 loop {
 	when i == 5 exit
 	i 1 INC
