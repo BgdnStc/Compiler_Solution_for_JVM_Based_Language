@@ -1,14 +1,7 @@
 package org.bgdnstc;
 
 public class Main {
-    public static void main(String[] args) throws NoSuchMethodException {
-//        Parser.parse("src\\source.bynt");
-//        Parser.parse("src\\source2.bynt");
-
-//        Parser.parse("src\\test.bynt");
-
-//        Parser.parse("src/UDPServer.bynt");
-//        Parser.parse("src/UDPClient.bynt");
+    public static void main(String[] args) {
 
 //TODO:
 //        code clean up
@@ -27,9 +20,6 @@ public class Main {
 //        test file path format (/ or \\) and its destination
 //        while loops
 //        (maybe fixed ?) fix case in which integer variables are saved as objects
-
-//        System.out.println(args[0]);
-//        Parser.parse(args[0]);
 
         for (String path : args) {
             System.out.println(path);
