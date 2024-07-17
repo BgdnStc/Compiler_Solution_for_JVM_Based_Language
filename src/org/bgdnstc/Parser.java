@@ -24,17 +24,16 @@ public class Parser {
     private static Stack<Label> labelStack = new Stack<>();
     // global array for keeping track of the declared variables type
     static ArrayList<Object> variablesTypes = new ArrayList<>();
-    // label for the loop structure
-    static Label labelWhen = new Label();
-    // label for end of the loop
-    static Label labelExit = new Label();
-
     // boolean for frames, knows if any frames have been created for the loop structure
     private static boolean multipleFrames = false;
     // boolean for checking if the parser is currently inside a loop
     private static boolean loopOpen = false;
     // boolean for checking if the loop has an exist condition
     private static boolean exitCondition = false;
+    // label for the loop structure
+    static Label labelWhen = new Label();
+    // label for end of the loop
+    static Label labelExit = new Label();
 
     // private constructor for preventing instantiation
     private Parser() {
@@ -182,7 +181,6 @@ public class Parser {
         } else if (check(Symbol.PRINT)) {
             match(Symbol.PRINT);
             if (check(Symbol.INT)) {
-                // TODO
                 BytecodeGenerator.printGetStatic();
                 expression(3);
                 BytecodeGenerator.printInvokeVirtualInt();
@@ -197,7 +195,7 @@ public class Parser {
             } else if (check(Symbol.IDENTIFIER)) {
                 expression(5);
             }
-        } else if(check(Symbol.LOOP)) {
+        } else if (check(Symbol.LOOP)) {
             match(Symbol.LOOP);
             match(Symbol.L_BRACKET);
             loopOpen = true;
@@ -212,15 +210,6 @@ public class Parser {
                 }
             }
             variablesTypes = variablesTypesLocal;
-//           TODO
-//            System.out.println(variablesTypesLocal.size());
-
-//            Collections.reverse(variablesTypesLocal);
-//           TODO
-//            System.out.println(Arrays.toString(variablesTypesLocal.toArray()));
-
-//            System.out.println(Type.getInternalName(int.class));
-//            System.out.println(Opcodes.INTEGER);
             multipleFrames = true;
             labelStack.add(BytecodeGenerator.visitLabel(variablesTypesLocal.size(), variablesTypesLocal));
         } else if (check(Symbol.R_BRACKET)) {
@@ -231,7 +220,7 @@ public class Parser {
             if (exitCondition) {
                 BytecodeGenerator.visitFrame(variablesTypes.size(), variablesTypes);
             }
-        } else if(check(Symbol.WHEN)) {
+        } else if (check(Symbol.WHEN)) {
             if (!loopOpen) {
                 throw new IllegalArgumentException("Unexpected token received. Token \"when\" can be used inside loop structures only");
             }
@@ -245,8 +234,8 @@ public class Parser {
 
     // validates the grammar of the provided expression
     private static void expression(int expressionPath) {
+        // socket variable initialisation
         if (expressionPath == 1) {
-            // socket variable initialisation
             if (check(Symbol.UDP_SERVER)) {
                 match(Symbol.UDP_SERVER);
                 match(Symbol.AT);
@@ -254,7 +243,7 @@ public class Parser {
                 if (!check(Symbol.EOL)) {
                     match(Symbol.STRING);
                     sockets.put(line[1], new String[]{line[index - 2], line[index - 1]});
-                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 2]), line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
+                    BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 2]), line[index - 1].substring(1, line[index - 1].length() - 1), identifierIndex);
                 } else {
                     sockets.put(line[1], new String[]{line[index - 1]});
                     BytecodeGenerator.createServerSocket(Integer.parseInt(line[index - 1]), null, identifierIndex);
@@ -266,7 +255,7 @@ public class Parser {
                 if (!check(Symbol.EOL)) {
                     match(Symbol.STRING);
                     sockets.put(line[1], new String[]{line[index - 2], line[index - 1]});
-                    BytecodeGenerator.createClientSocket(null, line[index -1].substring(1, line[index - 1].length() - 1), identifierIndex);
+                    BytecodeGenerator.createClientSocket(null, line[index - 1].substring(1, line[index - 1].length() - 1), identifierIndex);
                 } else {
                     sockets.put(line[1], new String[]{line[index - 1]});
                     BytecodeGenerator.createClientSocket(null, null, identifierIndex);
@@ -274,8 +263,9 @@ public class Parser {
             } else {
                 throw new IllegalArgumentException("Unexpected token received. Expected: UDPServer / UDPClient" + ", received token: " + line[index] + ".");
             }
-        } else if (expressionPath == 2) {
-            // int value or int operation with storing the result into a variable
+        }
+        // push int value or int operation with storing the result
+        else if (expressionPath == 2) {
             match(Symbol.INT);
             if (line.length == index) {
                 BytecodeGenerator.pushShort(Integer.parseInt(line[index - 1]));
@@ -302,8 +292,9 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (expressionPath == 3) {
-            // int value or int operation without storing the result into a variable
+        }
+        // int value or int operation without storing the result
+        else if (expressionPath == 3) {
             match(Symbol.INT);
             if (line.length == index) {
                 BytecodeGenerator.pushShort(Integer.parseInt(line[index - 1]));
@@ -325,8 +316,9 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (expressionPath == 4) {
-            // checking identifier methods
+        }
+        // check identifier methods
+        else if (expressionPath == 4) {
             if (check(Symbol.IDENTIFIER)) {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
                 match(Symbol.IDENTIFIER);
@@ -380,8 +372,10 @@ public class Parser {
                                 }
                             }
                         } else if (check(Symbol.EQUALS)) {
-                            // TODO
                             match(Symbol.EQUALS);
+                            throw new UnsupportedOperationException("Reassignment not supported for socket variables.");
+                        } else {
+                            throw new UnsupportedOperationException("Illegal socket operation.");
                         }
                     } else if (identifier[0].equals(Type.getInternalName(int.class))) {
                         if (check(Symbol.EQUALS)) {
@@ -409,7 +403,7 @@ public class Parser {
                         if (check(Symbol.EQUALS)) {
                             match(Symbol.EQUALS);
                             match(Symbol.STRING);
-                            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
+                            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index - 1].length() - 1));
                             BytecodeGenerator.storeString(Integer.parseInt(identifier[1]));
                         } else {
                             throw new PatternSyntaxException("Expected a statement. Received an identifier.", "identifier + symbol", 1);
@@ -419,16 +413,18 @@ public class Parser {
                     throw new IllegalArgumentException("Provided identifier does not exist or it has not been declared.");
                 }
             }
-        } else if(expressionPath == 5) {
-            // for printing variables
+        }
+        // print variables
+        else if (expressionPath == 5) {
             expression(10);
             if (line[index - 1].equals("receive")) {
                 BytecodeGenerator.printGetStatic();
                 BytecodeGenerator.packetToString(identifierIndex);
                 BytecodeGenerator.printInvokeVirtualString();
             }
-        } else if (expressionPath == 6) {
-            // float value or float operation with storing the result into a variable
+        }
+        // push float value or float operation with storing the result
+        else if (expressionPath == 6) {
             match(Symbol.FLOAT);
             if (line.length == index) {
                 BytecodeGenerator.pushConstantLdc(Float.parseFloat(line[index - 1]));
@@ -455,8 +451,9 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (expressionPath == 7) {
-            // float value or float operation without storing the result into a variable
+        }
+        // push float value or float operation without storing the result
+        else if (expressionPath == 7) {
             match(Symbol.FLOAT);
             if (line.length == index) {
                 BytecodeGenerator.pushConstantLdc(Float.parseFloat(line[index - 1]));
@@ -478,17 +475,20 @@ public class Parser {
                     match(nextSymbol());
                 }
             }
-        } else if (expressionPath == 8) {
-            // string value with storing the value
+        }
+        // push string value with storing the value
+        else if (expressionPath == 8) {
             match(Symbol.STRING);
-            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
+            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index - 1].length() - 1));
             BytecodeGenerator.storeString(identifierIndex);
-        } else if (expressionPath == 9) {
-            // string value without storing the value
+        }
+        // push string value without storing the value
+        else if (expressionPath == 9) {
             match(Symbol.STRING);
-            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index -1].length() - 1));
-        } else if (expressionPath == 10) {
-            // called by printing
+            BytecodeGenerator.pushConstantLdc(line[index - 1].substring(1, line[index - 1].length() - 1));
+        }
+        // called for print
+        else if (expressionPath == 10) {
             if (check(Symbol.IDENTIFIER)) {
                 String[] identifier = identifiers.getOrDefault(line[index], null);
                 match(Symbol.IDENTIFIER);
@@ -497,40 +497,6 @@ public class Parser {
                         match(Symbol.DOT);
                         if (check(Symbol.SEND)) {
                             throw new UnsupportedOperationException("Illegal statement. Print cannot be called on Socket's \"send\" method.");
-
-//                           TODO
-//                            if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
-//                                match(Symbol.SEND);
-//                                if (check(Symbol.STRING)) {
-//                                    match(Symbol.STRING);
-//                                    identifierIndex++;
-//                                    if (sockets.get(line[index - 4]).length > 1) {
-//                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, line[index - 4].length() - 1));
-//                                    } else {
-//                                        BytecodeGenerator.sendUDP(identifierIndex, Integer.parseInt(identifier[1]), line[index - 1].substring(1, line[index - 1].length() - 1), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
-//                                    }
-//                                } else if (check(Symbol.IDENTIFIER)) {
-//                                    match(Symbol.IDENTIFIER);
-//                                    String[] stringIdentifier = identifiers.getOrDefault(line[index - 1], null);
-//                                    if (stringIdentifier != null && stringIdentifier[0].equals(Type.getInternalName(String.class))) {
-//                                        identifierIndex++;
-//                                        if (sockets.get(line[index - 4]).length > 1) {
-//                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), sockets.get(line[index - 4])[1].substring(1, sockets.get(line[index - 4])[1].length() - 1));
-//                                        } else {
-//                                            BytecodeGenerator.sendIdentifierUDP(identifierIndex, Integer.parseInt(identifier[1]), Integer.parseInt(stringIdentifier[1]), Integer.parseInt(sockets.get(line[index - 4])[0]), null);
-//                                        }
-//                                    } else {
-//                                        throw new IllegalArgumentException("Expected string / string identifier after 'send' method");
-//                                    }
-//                                }
-//                            } else {
-//                                try {
-//                                    throw new NoSuchMethodException("UDP Client does not have such a method.");
-//                                } catch (NoSuchMethodException e) {
-//                                    throw new RuntimeException(e);
-//                                }
-//                            }
-
                         } else if (check(Symbol.RECEIVE)) {
                             if (identifier[0].equals(Type.getInternalName(DatagramSocket.class))) {
                                 match(Symbol.RECEIVE);
@@ -561,7 +527,9 @@ public class Parser {
                     throw new IllegalArgumentException("Provided identifier does not exist or it has not been declared.");
                 }
             }
-        } else if (expressionPath == 11) {
+        }
+        // when-exit structure
+        else if (expressionPath == 11) {
             if (check(Symbol.INT)) {
                 match(Symbol.INT);
                 if (check(Symbol.GREATER)) {
@@ -605,13 +573,9 @@ public class Parser {
                             match(Symbol.LOGIC_EQUALS);
                             match(Symbol.INT);
                             BytecodeGenerator.pushConstantLdc(Integer.parseInt(line[index - 1]));
-
-
                             BytecodeGenerator.logicEquals(labelWhen, labelExit);
                             BytecodeGenerator.visitFrame(variablesTypes.size(), variablesTypes);
-//                            BytecodeGenerator.visitLabel2(labelWhen);
                             match(Symbol.EXIT);
-//                            BytecodeGenerator.visitLabel2(labelExit);
                             multipleFrames = false;
                         } else {
                             throw new UnsupportedOperationException("Unexpected token. Invalid \"when\" expression symbol. Expected comparison operator, received: " + line[index]);

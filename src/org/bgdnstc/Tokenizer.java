@@ -9,7 +9,7 @@ public class Tokenizer {
         StringBuilder token = new StringBuilder();
         ArrayList<String> tokens = new ArrayList<>();
         Scanner scanner = new Scanner(line).useDelimiter("");
-        while(scanner.hasNext()) {
+        while (scanner.hasNext()) {
             String current = scanner.next();
             if (current.matches("\\d") && token.isEmpty()) {
                 token.append(current);

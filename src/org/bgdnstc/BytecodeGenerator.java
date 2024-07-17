@@ -23,97 +23,97 @@ public class BytecodeGenerator {
     private BytecodeGenerator() {
     }
 
-    static void createClass(String className) {
+    protected static void createClass(String className) {
         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         cw.visit(V21, ACC_PUBLIC + ACC_SUPER, className, null, Type.getInternalName(Object.class), null);
         mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "(" + Type.getDescriptor(String[].class) + ")V", null, null);
         mv.visitCode();
     }
 
-    static void pushByteInt(int constant) {
+    protected static void pushByteInt(int constant) {
         mv.visitIntInsn(BIPUSH, constant);
     }
 
-    static void pushShort(int constant) {
+    protected static void pushShort(int constant) {
         mv.visitIntInsn(SIPUSH, constant);
     }
 
-    static void pushConstantLdc(Object constant) {
+    protected static void pushConstantLdc(Object constant) {
         mv.visitLdcInsn(constant);
     }
 
-    static void storeInt(int index) {
+    protected static void storeInt(int index) {
         mv.visitVarInsn(ISTORE, index);
     }
 
-    static void storeFloat(int index) {
+    protected static void storeFloat(int index) {
         mv.visitVarInsn(FSTORE, index);
     }
 
-    static void storeString(int index) {
+    protected static void storeString(int index) {
         mv.visitVarInsn(ASTORE, index);
     }
 
-    static void addIntegers(int firstOperand, int secondOperand) {
+    protected static void addIntegers(int firstOperand, int secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(IADD);
     }
 
-    static void subtractIntegers(int firstOperand, int secondOperand) {
+    protected static void subtractIntegers(int firstOperand, int secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(ISUB);
     }
 
-    static void multiplyIntegers(int firstOperand, int secondOperand) {
+    protected static void multiplyIntegers(int firstOperand, int secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(IMUL);
     }
 
-    static void divideIntegers(int firstOperand, int secondOperand) {
+    protected static void divideIntegers(int firstOperand, int secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(IDIV);
     }
 
-    static void incrementIntegers(int firstOperandIdentifierIndex, int secondOperand) {
+    protected static void incrementIntegers(int firstOperandIdentifierIndex, int secondOperand) {
         mv.visitVarInsn(ILOAD, firstOperandIdentifierIndex);
         pushConstantLdc(secondOperand);
         mv.visitInsn(IADD);
         storeInt(firstOperandIdentifierIndex);
     }
 
-    static void addFloats(float firstOperand, float secondOperand) {
+    protected static void addFloats(float firstOperand, float secondOperand) {
         mv.visitLdcInsn(firstOperand);
         mv.visitLdcInsn(secondOperand);
         mv.visitInsn(FADD);
     }
 
-    static void subtractFloats(float firstOperand, float secondOperand) {
+    protected static void subtractFloats(float firstOperand, float secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(FSUB);
     }
 
-    static void multiplyFloats(float firstOperand, float secondOperand) {
+    protected static void multiplyFloats(float firstOperand, float secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(FMUL);
     }
 
-    static void divideFloats(float firstOperand, float secondOperand) {
+    protected static void divideFloats(float firstOperand, float secondOperand) {
         pushConstantLdc(firstOperand);
         pushConstantLdc(secondOperand);
         mv.visitInsn(FDIV);
     }
 
-    static void createServerSocket(Integer socket, String address, int index) {
+    protected static void createServerSocket(Integer socket, String address, int index) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
             mv.visitInsn(DUP);
-            if(address != null && socket != null) {
+            if (address != null && socket != null) {
                 mv.visitIntInsn(SIPUSH, socket);
                 mv.visitLdcInsn(address);
                 mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
@@ -130,11 +130,11 @@ public class BytecodeGenerator {
         }
     }
 
-    static void createClientSocket(Integer socket, String address, int index) {
+    protected static void createClientSocket(Integer socket, String address, int index) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramSocket.class));
             mv.visitInsn(DUP);
-            if(address != null && socket != null) {
+            if (address != null && socket != null) {
                 mv.visitIntInsn(SIPUSH, socket);
                 mv.visitLdcInsn(address);
                 mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(InetAddress.class), "getByName", Type.getMethodDescriptor(InetAddress.class.getMethod("getByName", String.class)), false);
@@ -151,7 +151,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static void sendUDP(int identifierIndex, int socketIndex, String message, int port, String address) {
+    protected static void sendUDP(int identifierIndex, int socketIndex, String message, int port, String address) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
             mv.visitInsn(DUP);
@@ -173,7 +173,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static void sendIdentifierUDP(int identifierIndex, int socketIndex, int messageIndex, int port, String address) {
+    protected static void sendIdentifierUDP(int identifierIndex, int socketIndex, int messageIndex, int port, String address) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
             mv.visitInsn(DUP);
@@ -195,7 +195,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static void receiveUDP(int identifierIndex, int socketIndex) {
+    protected static void receiveUDP(int identifierIndex, int socketIndex) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(DatagramPacket.class));
             mv.visitInsn(DUP);
@@ -212,11 +212,11 @@ public class BytecodeGenerator {
         }
     }
 
-    static void printGetStatic() {
+    protected static void printGetStatic() {
         mv.visitFieldInsn(GETSTATIC, Type.getInternalName(System.class), "out", Type.getDescriptor(PrintStream.class));
     }
 
-    static void printInvokeVirtualInt() {
+    protected static void printInvokeVirtualInt() {
         try {
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", int.class)), false);
         } catch (NoSuchMethodException e) {
@@ -224,7 +224,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static void printInvokeVirtualFloat() {
+    protected static void printInvokeVirtualFloat() {
         try {
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", float.class)), false);
         } catch (NoSuchMethodException e) {
@@ -232,7 +232,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static void printInvokeVirtualString() {
+    protected static void printInvokeVirtualString() {
         try {
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(PrintStream.class), "println", Type.getMethodDescriptor(PrintStream.class.getMethod("println", String.class)), false);
         } catch (NoSuchMethodException e) {
@@ -240,19 +240,19 @@ public class BytecodeGenerator {
         }
     }
 
-    static void loadInteger(int identifierIndex) {
+    protected static void loadInteger(int identifierIndex) {
         mv.visitVarInsn(ILOAD, identifierIndex);
     }
 
-    static void loadFloat(int identifierIndex) {
+    protected static void loadFloat(int identifierIndex) {
         mv.visitVarInsn(FLOAD, identifierIndex);
     }
 
-    static void loadReference(int identifierIndex) {
+    protected static void loadReference(int identifierIndex) {
         mv.visitVarInsn(ALOAD, identifierIndex);
     }
 
-    static void packetToString(int packetIndex) {
+    protected static void packetToString(int packetIndex) {
         try {
             mv.visitTypeInsn(NEW, Type.getInternalName(String.class));
             mv.visitInsn(DUP);
@@ -265,7 +265,7 @@ public class BytecodeGenerator {
         }
     }
 
-    static Label visitLabel(int localFrameSize, ArrayList<Object> locals) {
+    protected static Label visitLabel(int localFrameSize, ArrayList<Object> locals) {
         Object[] localsArray;
         Label label = new Label();
         mv.visitLabel(label);
@@ -280,37 +280,37 @@ public class BytecodeGenerator {
         return label;
     }
 
-    static void visitLabel2(Label label) {
+    protected static void visitLabel2(Label label) {
         mv.visitLabel(label);
     }
 
-    static void visitFrame(int localFrameSize, ArrayList<Object> locals) {
+    protected static void visitFrame(int localFrameSize, ArrayList<Object> locals) {
         mv.visitFrame(F_SAME, localFrameSize, locals.toArray(), 0, null);
     }
 
-    static void logicGreater(Label labelWhen, Label labelExit) {
+    protected static void logicGreater(Label labelWhen, Label labelExit) {
         mv.visitJumpInsn(IF_ICMPGT, labelWhen);
         mv.visitJumpInsn(GOTO, labelExit);
         mv.visitLabel(labelWhen);
     }
 
-    static void logicLess(Label labelWhen, Label labelExit) {
+    protected static void logicLess(Label labelWhen, Label labelExit) {
         mv.visitJumpInsn(IF_ICMPLT, labelWhen);
         mv.visitJumpInsn(GOTO, labelExit);
         mv.visitLabel(labelWhen);
     }
 
-    static void logicEquals(Label labelWhen, Label labelExit) {
+    protected static void logicEquals(Label labelWhen, Label labelExit) {
         mv.visitJumpInsn(IF_ICMPNE, labelWhen);
         mv.visitJumpInsn(GOTO, labelExit);
         mv.visitLabel(labelWhen);
     }
 
-    static void gotoLabel(Label label) {
+    protected static void gotoLabel(Label label) {
         mv.visitJumpInsn(GOTO, label);
     }
 
-    static byte[] closeClass(boolean multipleFrames) {
+    protected static byte[] closeClass(boolean multipleFrames) {
         if (!multipleFrames) {
             mv.visitInsn(RETURN);
         }

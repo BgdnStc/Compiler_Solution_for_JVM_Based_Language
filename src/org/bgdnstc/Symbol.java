@@ -3,9 +3,9 @@ package org.bgdnstc;
 public enum Symbol {
     // variable types
     TYPE_INT, TYPE_FLOAT, TYPE_STRING, SOCKET, UDP_SERVER, UDP_CLIENT,
-    // values
+    // value types
     INT, FLOAT, STRING,
-    // operators
+    // operators / conditional structures
     EQUALS, ADD, SUB, MUL, DIV, INC, LOOP, WHEN, EXIT, WHILE,
     // logic operators
     GREATER, LESS, LOGIC_EQUALS,
